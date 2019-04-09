@@ -1,5 +1,5 @@
 # prov-matrix
-Prov-XML to CRSMatrix
+Prov to CRSMatrix
 
 
 IC/UFF
