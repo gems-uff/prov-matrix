@@ -18,10 +18,10 @@ import org.openprovenance.prov.model.WasAssociatedWith;
  * Represents Activity -> Agent | WasAssociatedWith
  *
  */
-public class ActivityAgent {
+public class ActivityAgent implements ProvMatrix {
 
 	private CRSMatrix matrix;
-	private Document d;
+	private Document document;
 	private List<String> activitiesId;
 	private List<String> agentsId;
 
@@ -34,7 +34,7 @@ public class ActivityAgent {
 
 	public ActivityAgent(Document d) {
 		this();
-		this.d=d;
+		this.document = d;
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
@@ -43,14 +43,14 @@ public class ActivityAgent {
 				activitiesId.add(ac.getId().getLocalPart());
 			} else if (sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
-				activitiesId.add(ag.getId().getLocalPart());
+				agentsId.add(ag.getId().getLocalPart());
 			}
 		}
 		matrix = new CRSMatrix(activitiesId.size(), agentsId.size());
 	}
 
 	public void buildMatrix() {
-		List<StatementOrBundle> sbs = d.getStatementOrBundle();
+		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ASSOCIATION) {
@@ -84,6 +84,24 @@ public class ActivityAgent {
 
 	public void setAgentsId(List<String> agentsId) {
 		this.agentsId = agentsId;
+	}
+
+	public Document getDocument() {
+		return document;
+	}
+
+	public void setDocument(Document document) {
+		this.document = document;
+	}
+
+	@Override
+	public List<String> getColumnDescriptors() {
+		return this.getAgentsId();
+	}
+
+	@Override
+	public List<String> getRowDescriptors() {
+		return this.getActivitiesId();
 	}
 
 }

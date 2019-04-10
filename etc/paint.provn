@@ -1,0 +1,57 @@
+document
+default <http://painters.org>
+
+entity(The_Last_Supper)
+entity(Monalisa)
+entity(The_Annunciation)
+entity(The_Creation_Of_Adam)
+entity(The_Last_Judgement)
+entity(The_Persistence_Of_Memory)
+entity(Oil)
+entity(Fresco)
+
+agent(Da_Vinci)
+agent(Michelangelo)
+agent(Salvador_Dali)
+agent(Prado_Museum)
+agent(Reina_Sofia)
+
+activity(Paint,-,-)
+activity(Acquire,-,-)
+activity(Donate,-,-)
+
+wasDerivedFrom(The_Last_Supper,Fresco)
+wasDerivedFrom(Monalisa,Oil)
+wasDerivedFrom(The_Annunciation,Oil)
+wasDerivedFrom(The_Creation_Of_Adam, Fresco)
+wasDerivedFrom(The_Last_Judgement,Fresco)
+wasDerivedFrom(The_Persistence_Of_Memory,Oil)
+
+wasGeneratedBy(The_Last_Supper,Paint,-)
+wasGeneratedBy(Monalisa,Paint,-)
+wasGeneratedBy(The_Annunciation,Paint,-)
+wasGeneratedBy(The_Creation_Of_Adam,Paint,-)
+wasGeneratedBy(The_Last_Judgement,Paint,-)
+wasGeneratedBy(The_Persistence_Of_Memory,Paint,-)
+
+used(Acquire,The_Last_Supper,-)
+used(Acquire,Monalisa,-)
+used(Acquire,The_Annunciation,-)
+used(Acquire,The_Creation_Of_Adam,-)
+used(Acquire,The_Last_Judgement,-)
+used(Donate,The_Persistence_Of_Memory,-)
+
+wasAttributedTo(The_Last_Supper,Da_Vinci)
+wasAttributedTo(Monalisa,Da_Vinci)
+wasAttributedTo(The_Annunciation,Da_Vinci)
+wasAttributedTo(The_Creation_Of_Adam,Michelangelo)
+wasAttributedTo(The_Last_Judgement,Michelangelo)
+wasAttributedTo(The_Persistence_Of_Memory,Salvador_Dali)
+
+wasAssociatedWith(DaVinciPainted;Paint, Da_Vinci,-)
+wasAssociatedWith(MichelangeloPainted;Paint, Michelangelo,-)
+wasAssociatedWith(DaliPainted;Paint, Salvador_Dali,-)
+wasAssociatedWith(DaliDonated;Donate, Salvador_Dali,-)
+wasAssociatedWith(PradoAcquired;Acquire, Prado_Museum,-)
+wasAssociatedWith(ReinaAcquired;Acquire, Reina_Sofia,-)
+endDocument
