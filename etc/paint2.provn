@@ -1,0 +1,57 @@
+document
+default <http://painters.org>
+
+entity(Last_Supper)
+entity(Monalisa)
+entity(Annunciation)
+entity(Adams_Creation)
+entity(Last_Judgement)
+entity(Memories_Persistence)
+entity(Oil)
+entity(Fresco)
+
+agent(Da_Vinci)
+agent(Michelangelo)
+agent(Dali)
+agent(Prado)
+agent(Sofia)
+
+activity(Paint,-,-)
+activity(Acquire,-,-)
+activity(Donate,-,-)
+
+wasDerivedFrom(Last_Supper,Fresco)
+wasDerivedFrom(Monalisa,Oil)
+wasDerivedFrom(Annunciation,Oil)
+wasDerivedFrom(Adams_Creation, Fresco)
+wasDerivedFrom(Last_Judgement,Fresco)
+wasDerivedFrom(Memories_Persistence,Oil)
+
+wasGeneratedBy(Last_Supper,Paint,-)
+wasGeneratedBy(Monalisa,Paint,-)
+wasGeneratedBy(Annunciation,Paint,-)
+wasGeneratedBy(Adams_Creation,Paint,-)
+wasGeneratedBy(Last_Judgement,Paint,-)
+wasGeneratedBy(Memories_Persistence,Paint,-)
+
+used(Acquire,Last_Supper,-)
+used(Acquire,Monalisa,-)
+used(Acquire,Annunciation,-)
+used(Acquire,Adams_Creation,-)
+used(Acquire,Last_Judgement,-)
+used(Donate,Memories_Persistence,-)
+
+wasAttributedTo(Last_Supper,Da_Vinci)
+wasAttributedTo(Monalisa,Da_Vinci)
+wasAttributedTo(Annunciation,Da_Vinci)
+wasAttributedTo(Adams_Creation,Michelangelo)
+wasAttributedTo(Last_Judgement,Michelangelo)
+wasAttributedTo(Memories_Persistence,Dali)
+
+wasAssociatedWith(DaVinciPainted;Paint, Da_Vinci,-)
+wasAssociatedWith(MichelangeloPainted;Paint, Michelangelo,-)
+wasAssociatedWith(DaliPainted;Paint, Dali,-)
+wasAssociatedWith(DaliDonated;Donate, Dali,-)
+wasAssociatedWith(PradoAcquired;Acquire, Prado,-)
+wasAssociatedWith(ReinaAcquired;Acquire, Sofia,-)
+endDocument

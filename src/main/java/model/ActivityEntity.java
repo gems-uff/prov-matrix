@@ -10,76 +10,56 @@ import org.openprovenance.prov.model.Document;
 import org.openprovenance.prov.model.Entity;
 import org.openprovenance.prov.model.StatementOrBundle;
 import org.openprovenance.prov.model.StatementOrBundle.Kind;
-import org.openprovenance.prov.model.WasGeneratedBy;
-import org.openprovenance.prov.model.WasInvalidatedBy;
+import org.openprovenance.prov.model.Used;
 
 /**
  * @author Victor
  * 
- * Represents Entity -> Activity : WasGeneratedBy || WasInvalidatedBy
+ * Represents Activity -> Entity : Used
  *
  */
-public class EntityActivity implements ProvMatrix {
+public class ActivityEntity implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
 	private Document document;
-	private List<String> entitiesId;
 	private List<String> activitiesId;
+	private List<String> entitiesId;
 
-	public EntityActivity() {
+	public ActivityEntity() {
 		super();
-		this.entitiesId = new ArrayList<>();
+		this.relation = Relation.RELATION_USAGE;
 		this.activitiesId = new ArrayList<>();
+		this.entitiesId = new ArrayList<>();
 		this.matrix = new CRSMatrix();
 	}
 
-	public EntityActivity(Relation relation) {
-		super();
-		this.relation = relation;
-	}
-
-	public EntityActivity(Document d) {
+	public ActivityEntity(Document d) {
 		this();
 		this.document = d;
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ENTITY) {
-				Entity et = (Entity) sb;
-				entitiesId.add(et.getId().getLocalPart());
-			} else if (sb.getKind() == Kind.PROV_ACTIVITY) {
+			if (sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
 				activitiesId.add(ac.getId().getLocalPart());
+			} else if (sb.getKind() == Kind.PROV_ENTITY) {
+				Entity et = (Entity) sb;
+				entitiesId.add(et.getId().getLocalPart());
 			}
 		}
-		matrix = new CRSMatrix(entitiesId.size(), activitiesId.size());
+		matrix = new CRSMatrix(activitiesId.size(), entitiesId.size());
 	}
 
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			Kind k = sb.getKind();
-			if (k == this.relation.getKind()) {
-				switch (k) {
-				case PROV_GENERATION: {
-					WasGeneratedBy wg = (WasGeneratedBy) sb;
-					int i = entitiesId.indexOf(wg.getEntity().getLocalPart());
-					int j = activitiesId.indexOf(wg.getActivity().getLocalPart());
-					matrix.set(i, j, matrix.get(i, j) + 1);
-					break;
-				}
-				case PROV_INVALIDATION: {
-					WasInvalidatedBy wi = (WasInvalidatedBy) sb;
-					int i = entitiesId.indexOf(wi.getEntity().getLocalPart());
-					int j = activitiesId.indexOf(wi.getActivity().getLocalPart());
-					matrix.set(i, j, matrix.get(i, j) + 1);
-					break;
-				}
-				default:
-					break;
-				}
+			if (sb.getKind() == this.relation.getKind()) {
+				Used used = (Used) sb;
+				int i = activitiesId.indexOf(used.getActivity().getLocalPart());
+				int j = entitiesId.indexOf(used.getEntity().getLocalPart());
+				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}
 	}
@@ -92,20 +72,20 @@ public class EntityActivity implements ProvMatrix {
 		this.matrix = matrix;
 	}
 
-	public List<String> getEntitiesId() {
-		return entitiesId;
-	}
-
-	public void setEntitiesId(List<String> activitiesId) {
-		this.entitiesId = activitiesId;
-	}
-
 	public List<String> getActivitiesId() {
 		return activitiesId;
 	}
 
-	public void setActivitiesId(List<String> agentsId) {
-		this.activitiesId = agentsId;
+	public void setActivitiesId(List<String> activitiesId) {
+		this.activitiesId = activitiesId;
+	}
+
+	public List<String> getEntitiesId() {
+		return entitiesId;
+	}
+
+	public void setEntitiesId(List<String> entitiesId) {
+		this.entitiesId = entitiesId;
 	}
 
 	public Document getDocument() {
@@ -118,16 +98,17 @@ public class EntityActivity implements ProvMatrix {
 
 	@Override
 	public List<String> getColumnDescriptors() {
-		return this.getActivitiesId();
+		return this.getEntitiesId();
 	}
 
 	@Override
 	public List<String> getRowDescriptors() {
-		return this.getEntitiesId();
+		return this.getActivitiesId();
 	}
 
+	@Override
 	public Relation getRelation() {
-		return relation;
+		return this.relation;
 	}
 
 	public void setRelation(Relation relation) {

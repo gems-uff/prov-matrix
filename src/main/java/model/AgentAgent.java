@@ -5,50 +5,47 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.la4j.matrix.sparse.CRSMatrix;
+import org.openprovenance.prov.model.ActedOnBehalfOf;
 import org.openprovenance.prov.model.Agent;
 import org.openprovenance.prov.model.Document;
-import org.openprovenance.prov.model.Entity;
 import org.openprovenance.prov.model.StatementOrBundle;
 import org.openprovenance.prov.model.StatementOrBundle.Kind;
-import org.openprovenance.prov.model.WasAttributedTo;
 
 /**
  * @author Victor
  * 
- * Represents Entity -> Agent | WasAttributedTo
+ * Represents Agent -> Agent : actedOnBehalfOf
  *
  */
-public class EntityAgent implements ProvMatrix {
+public class AgentAgent implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
 	private Document document;
-	private List<String> entitiesId;
-	private List<String> agentsId;
+	private List<String> originAgentsId;
+	private List<String> destinationAgentsId;
 
-	public EntityAgent() {
+	public AgentAgent() {
 		super();
-		this.relation = Relation.RELATION_ATTRIBUTION;
-		this.entitiesId = new ArrayList<>();
-		this.agentsId = new ArrayList<>();
+		this.relation = Relation.RELATION_DELEGATION;
+		this.originAgentsId = new ArrayList<>();
+		this.destinationAgentsId = new ArrayList<>();
 		this.matrix = new CRSMatrix();
 	}
 
-	public EntityAgent(Document d) {
+	public AgentAgent(Document d) {
 		this();
 		this.document = d;
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ENTITY) {
-				Entity et = (Entity) sb;
-				entitiesId.add(et.getId().getLocalPart());
-			} else if (sb.getKind() == Kind.PROV_AGENT) {
+			if (sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
-				agentsId.add(ag.getId().getLocalPart());
+				originAgentsId.add(ag.getId().getLocalPart());
+				destinationAgentsId.add(ag.getId().getLocalPart());
 			}
 		}
-		matrix = new CRSMatrix(entitiesId.size(), agentsId.size());
+		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
 	}
 
 	public void buildMatrix() {
@@ -56,9 +53,9 @@ public class EntityAgent implements ProvMatrix {
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == this.relation.getKind()) {
-				WasAttributedTo wa = (WasAttributedTo) sb;
-				int i = entitiesId.indexOf(wa.getEntity().getLocalPart());
-				int j = agentsId.indexOf(wa.getAgent().getLocalPart());
+				ActedOnBehalfOf wd = (ActedOnBehalfOf) sb;
+				int i = originAgentsId.indexOf(wd.getDelegate().getLocalPart());
+				int j = destinationAgentsId.indexOf(wd.getResponsible().getLocalPart());
 				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}
@@ -72,20 +69,20 @@ public class EntityAgent implements ProvMatrix {
 		this.matrix = matrix;
 	}
 
-	public List<String> getEntitiesId() {
-		return entitiesId;
+	public List<String> getOriginAgentsId() {
+		return originAgentsId;
 	}
 
-	public void setEntitiesId(List<String> activitiesId) {
-		this.entitiesId = activitiesId;
+	public void setOriginAgentsId(List<String> activitiesId) {
+		this.originAgentsId = activitiesId;
 	}
 
-	public List<String> getAgentsId() {
-		return agentsId;
+	public List<String> getDestinationAgentsId() {
+		return destinationAgentsId;
 	}
 
-	public void setAgentsId(List<String> agentsId) {
-		this.agentsId = agentsId;
+	public void setDestinationAgentsId(List<String> agentsId) {
+		this.destinationAgentsId = agentsId;
 	}
 
 	public Document getDocument() {
@@ -98,12 +95,12 @@ public class EntityAgent implements ProvMatrix {
 
 	@Override
 	public List<String> getColumnDescriptors() {
-		return this.getAgentsId();
+		return this.getDestinationAgentsId();
 	}
 
 	@Override
 	public List<String> getRowDescriptors() {
-		return this.getEntitiesId();
+		return this.getOriginAgentsId();
 	}
 
 	public Relation getRelation() {

@@ -15,20 +15,21 @@ import org.openprovenance.prov.model.WasAssociatedWith;
 /**
  * @author Victor
  * 
- * Represents Activity -> Agent | WasAssociatedWith
+ * Represents Activity -> Agent : wasAssociatedWith
  *
  */
 public class ActivityAgent implements ProvMatrix {
 
 	private CRSMatrix matrix;
+	private Relation relation;
 	private Document document;
 	private List<String> activitiesId;
 	private List<String> agentsId;
 
 	public ActivityAgent() {
-		super();
-		this.activitiesId = new ArrayList<>();
+		this.relation = Relation.RELATION_ASSOCIATION;
 		this.agentsId = new ArrayList<>();
+		this.activitiesId = new ArrayList<>();
 		this.matrix = new CRSMatrix();
 	}
 
@@ -46,14 +47,14 @@ public class ActivityAgent implements ProvMatrix {
 				agentsId.add(ag.getId().getLocalPart());
 			}
 		}
-		matrix = new CRSMatrix(activitiesId.size(), agentsId.size());
+		matrix = new CRSMatrix(agentsId.size(), activitiesId.size());
 	}
 
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ASSOCIATION) {
+			if (sb.getKind() == this.relation.getKind()) {
 				WasAssociatedWith wa = (WasAssociatedWith) sb;
 				int i = activitiesId.indexOf(wa.getActivity().getLocalPart());
 				int j = agentsId.indexOf(wa.getAgent().getLocalPart());
@@ -62,12 +63,27 @@ public class ActivityAgent implements ProvMatrix {
 		}
 	}
 
+	@Override
 	public CRSMatrix getMatrix() {
-		return matrix;
+		return this.matrix;
 	}
 
-	public void setMatrix(CRSMatrix matrix) {
-		this.matrix = matrix;
+	@Override
+	public List<String> getColumnDescriptors() {
+		return this.agentsId;
+	}
+
+	@Override
+	public List<String> getRowDescriptors() {
+		return this.activitiesId;
+	}
+
+	public List<String> getAgentsId() {
+		return agentsId;
+	}
+
+	public void setAgentsId(List<String> entitiesId) {
+		this.agentsId = entitiesId;
 	}
 
 	public List<String> getActivitiesId() {
@@ -78,30 +94,16 @@ public class ActivityAgent implements ProvMatrix {
 		this.activitiesId = activitiesId;
 	}
 
-	public List<String> getAgentsId() {
-		return agentsId;
+	public void setMatrix(CRSMatrix matrix) {
+		this.matrix = matrix;
 	}
 
-	public void setAgentsId(List<String> agentsId) {
-		this.agentsId = agentsId;
+	public Relation getRelation() {
+		return relation;
 	}
 
-	public Document getDocument() {
-		return document;
-	}
-
-	public void setDocument(Document document) {
-		this.document = document;
-	}
-
-	@Override
-	public List<String> getColumnDescriptors() {
-		return this.getAgentsId();
-	}
-
-	@Override
-	public List<String> getRowDescriptors() {
-		return this.getActivitiesId();
+	public void setRelation(Relation relation) {
+		this.relation = relation;
 	}
 
 }

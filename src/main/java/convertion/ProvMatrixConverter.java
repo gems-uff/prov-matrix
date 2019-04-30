@@ -2,6 +2,9 @@ package convertion;
 
 import java.util.Iterator;
 
+import org.la4j.LinearAlgebra.InverterFactory;
+import org.la4j.matrix.Matrix;
+import org.la4j.matrix.dense.Basic2DMatrix;
 import org.la4j.matrix.sparse.CRSMatrix;
 
 import model.ProvMatrix;
@@ -64,6 +67,50 @@ public class ProvMatrixConverter {
 			}
 		}
 		return firstLine + sb.toString();
+	}
+
+	public String toCSV(Matrix matrix) {
+		StringBuffer sb = new StringBuffer();
+		if (matrix != null) {
+			int i = 0;
+			int j = 0;
+			int rows = matrix.rows();
+			int columns = matrix.columns();
+			while (i < rows) {
+				while (j < columns) {
+					Double d = new Double(matrix.get(i, j));
+					if (j != columns - 1) {
+						sb.append(d.intValue() + ",");
+					} else {
+						sb.append(d.intValue());
+					}
+					j++;
+				}
+				if (i != (rows - 1)) {
+					sb.append("\n");
+				}
+				j = 0;
+				i++;
+			}
+		}
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		Matrix a = new Basic2DMatrix(new double[][]{
+			   { 1.0, 2.0, 3.0 },
+			   { 4.0, 5.0, 6.0 },
+			   { 7.0, 8.0, 9.0 }
+			});
+		Matrix b = new Basic2DMatrix(new double[][]{
+			   { 7.0, 8.0, 9.0 },
+			   { 1.0, 2.0, 3.0 },
+			   { 5.0, 5.0, 6.0 }
+			});
+		Matrix c = a.multiply(b);
+		Matrix d = b.withInverter(InverterFactory.GAUSS_JORDAN).inverse();
+		System.out.println(ProvMatrixConverter.getInstance().toCSV(c));
+		System.out.println(ProvMatrixConverter.getInstance().toCSV(c.multiply(d)));
 	}
 
 }
