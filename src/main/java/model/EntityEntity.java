@@ -18,7 +18,7 @@ import org.openprovenance.prov.model.WasInfluencedBy;
 /**
  * @author Victor
  * 
- * Represents Entity -> Entity : wasDerivedFrom || 	wasInfluencedBy || alternateOf || specializationOf || memberOf
+ * Represents Entity -> Entity : wasDerivedFrom || 	wasInfluencedBy || alternateOf || specializationOf || mentionOf
  *
  */
 public class EntityEntity implements ProvMatrix {
