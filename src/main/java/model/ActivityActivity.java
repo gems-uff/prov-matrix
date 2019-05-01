@@ -19,7 +19,7 @@ import org.openprovenance.prov.model.WasStartedBy;
  * Represents Activity -> Activity : WasInformedBy || WasStartedBy || WasEndedBy 
  *
  */
-public class ActivityActivity implements ProvMatrix {
+public class ActivityActivity extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -47,8 +47,8 @@ public class ActivityActivity implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
-				originActivitiesId.add(ac.getId().getLocalPart());
-				destinationActivitiesId.add(ac.getId().getLocalPart());
+				originActivitiesId.add(id(ac.getId()));
+				destinationActivitiesId.add(id(ac.getId()));
 			}
 		}
 		matrix = new CRSMatrix(originActivitiesId.size(), destinationActivitiesId.size());
@@ -63,22 +63,22 @@ public class ActivityActivity implements ProvMatrix {
 				switch (k) {
 				case PROV_COMMUNICATION: {
 					WasInformedBy wi = (WasInformedBy) sb;
-					int i = originActivitiesId.indexOf(wi.getInformed().getLocalPart());
-					int j = destinationActivitiesId.indexOf(wi.getInformant().getLocalPart());
+					int i = originActivitiesId.indexOf(id(wi.getInformed()));
+					int j = destinationActivitiesId.indexOf(id(wi.getInformant()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_START: {
 					WasStartedBy ws = (WasStartedBy) sb;
-					int i = originActivitiesId.indexOf(ws.getTrigger().getLocalPart());
-					int j = destinationActivitiesId.indexOf(ws.getStarter().getLocalPart());
+					int i = originActivitiesId.indexOf(id(ws.getTrigger()));
+					int j = destinationActivitiesId.indexOf(id(ws.getActivity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_END: {
 					WasEndedBy we = (WasEndedBy) sb;
-					int i = originActivitiesId.indexOf(we.getTrigger().getLocalPart());
-					int j = destinationActivitiesId.indexOf(we.getEnder().getLocalPart());
+					int i = originActivitiesId.indexOf(id(we.getTrigger()));
+					int j = destinationActivitiesId.indexOf(id(we.getActivity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}

@@ -17,7 +17,7 @@ import org.openprovenance.prov.model.StatementOrBundle.Kind;
  * Represents Agent -> Agent : actedOnBehalfOf
  *
  */
-public class AgentAgent implements ProvMatrix {
+public class AgentAgent extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -41,8 +41,8 @@ public class AgentAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
-				originAgentsId.add(ag.getId().getLocalPart());
-				destinationAgentsId.add(ag.getId().getLocalPart());
+				originAgentsId.add(id(ag.getId()));
+				destinationAgentsId.add(id(ag.getId()));
 			}
 		}
 		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
@@ -54,8 +54,8 @@ public class AgentAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == this.relation.getKind()) {
 				ActedOnBehalfOf wd = (ActedOnBehalfOf) sb;
-				int i = originAgentsId.indexOf(wd.getDelegate().getLocalPart());
-				int j = destinationAgentsId.indexOf(wd.getResponsible().getLocalPart());
+				int i = originAgentsId.indexOf(id(wd.getDelegate()));
+				int j = destinationAgentsId.indexOf(id(wd.getResponsible()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}

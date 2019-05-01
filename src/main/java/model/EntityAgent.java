@@ -18,7 +18,7 @@ import org.openprovenance.prov.model.WasAttributedTo;
  * Represents Entity -> Agent | WasAttributedTo
  *
  */
-public class EntityAgent implements ProvMatrix {
+public class EntityAgent extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -42,10 +42,10 @@ public class EntityAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
-				entitiesId.add(et.getId().getLocalPart());
+				entitiesId.add(id(et.getId()));
 			} else if (sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
-				agentsId.add(ag.getId().getLocalPart());
+				agentsId.add(id(ag.getId()));
 			}
 		}
 		matrix = new CRSMatrix(entitiesId.size(), agentsId.size());
@@ -57,8 +57,8 @@ public class EntityAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == this.relation.getKind()) {
 				WasAttributedTo wa = (WasAttributedTo) sb;
-				int i = entitiesId.indexOf(wa.getEntity().getLocalPart());
-				int j = agentsId.indexOf(wa.getAgent().getLocalPart());
+				int i = entitiesId.indexOf(id(wa.getEntity()));
+				int j = agentsId.indexOf(id(wa.getAgent()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}

@@ -19,7 +19,7 @@ import org.openprovenance.prov.model.WasInvalidatedBy;
  * Represents Entity -> Activity : WasGeneratedBy || WasInvalidatedBy
  *
  */
-public class EntityActivity implements ProvMatrix {
+public class EntityActivity extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -47,10 +47,10 @@ public class EntityActivity implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
-				entitiesId.add(et.getId().getLocalPart());
+				entitiesId.add(id(et.getId()));
 			} else if (sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
-				activitiesId.add(ac.getId().getLocalPart());
+				activitiesId.add(id(ac.getId()));
 			}
 		}
 		matrix = new CRSMatrix(entitiesId.size(), activitiesId.size());
@@ -65,15 +65,15 @@ public class EntityActivity implements ProvMatrix {
 				switch (k) {
 				case PROV_GENERATION: {
 					WasGeneratedBy wg = (WasGeneratedBy) sb;
-					int i = entitiesId.indexOf(wg.getEntity().getLocalPart());
-					int j = activitiesId.indexOf(wg.getActivity().getLocalPart());
+					int i = entitiesId.indexOf(id(wg.getEntity()));
+					int j = activitiesId.indexOf(id(wg.getActivity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_INVALIDATION: {
 					WasInvalidatedBy wi = (WasInvalidatedBy) sb;
-					int i = entitiesId.indexOf(wi.getEntity().getLocalPart());
-					int j = activitiesId.indexOf(wi.getActivity().getLocalPart());
+					int i = entitiesId.indexOf(id(wi.getEntity()));
+					int j = activitiesId.indexOf(id(wi.getActivity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}

@@ -18,7 +18,7 @@ import org.openprovenance.prov.model.Used;
  * Represents Activity -> Entity : Used
  *
  */
-public class ActivityEntity implements ProvMatrix {
+public class ActivityEntity extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -42,10 +42,10 @@ public class ActivityEntity implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
-				activitiesId.add(ac.getId().getLocalPart());
+				activitiesId.add(id(ac.getId()));
 			} else if (sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
-				entitiesId.add(et.getId().getLocalPart());
+				entitiesId.add(id(et.getId()));
 			}
 		}
 		matrix = new CRSMatrix(activitiesId.size(), entitiesId.size());
@@ -57,8 +57,8 @@ public class ActivityEntity implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == this.relation.getKind()) {
 				Used used = (Used) sb;
-				int i = activitiesId.indexOf(used.getActivity().getLocalPart());
-				int j = entitiesId.indexOf(used.getEntity().getLocalPart());
+				int i = activitiesId.indexOf(id(used.getActivity()));
+				int j = entitiesId.indexOf(id(used.getEntity()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}

@@ -21,7 +21,7 @@ import org.openprovenance.prov.model.WasInfluencedBy;
  * Represents Entity -> Entity : wasDerivedFrom || 	wasInfluencedBy || alternateOf || specializationOf || mentionOf
  *
  */
-public class EntityEntity implements ProvMatrix {
+public class EntityEntity extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -49,8 +49,8 @@ public class EntityEntity implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
-				originEntitiesId.add(et.getId().getLocalPart());
-				destinationEntitiesId.add(et.getId().getLocalPart());
+				originEntitiesId.add(id(et.getId()));
+				destinationEntitiesId.add(id(et.getId()));
 			}
 		}
 		matrix = new CRSMatrix(originEntitiesId.size(), destinationEntitiesId.size());
@@ -58,43 +58,42 @@ public class EntityEntity implements ProvMatrix {
 
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
-		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
-			StatementOrBundle sb = iterator.next();
+		for (StatementOrBundle sb : sbs) {
 			Kind k = sb.getKind();
 			if (k == this.relation.getKind()) {
 				switch (k) {
 				case PROV_DERIVATION: {
 					WasDerivedFrom wd = (WasDerivedFrom) sb;
-					int i = originEntitiesId.indexOf(wd.getGeneratedEntity().getLocalPart());
-					int j = destinationEntitiesId.indexOf(wd.getUsedEntity().getLocalPart());
+					int i = originEntitiesId.indexOf(id(wd.getGeneratedEntity()));
+					int j = destinationEntitiesId.indexOf(id(wd.getUsedEntity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_INFLUENCE: {
 					WasInfluencedBy wi = (WasInfluencedBy) sb;
-					int i = originEntitiesId.indexOf(wi.getInfluencee().getLocalPart());
-					int j = destinationEntitiesId.indexOf(wi.getInfluencer().getLocalPart());
+					int i = originEntitiesId.indexOf(id(wi.getInfluencee()));
+					int j = destinationEntitiesId.indexOf(id(wi.getInfluencer()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_ALTERNATE: {
 					AlternateOf ao = (AlternateOf) sb;
-					int i = originEntitiesId.indexOf(ao.getAlternate1().getLocalPart());
-					int j = destinationEntitiesId.indexOf(ao.getAlternate2().getLocalPart());
+					int i = originEntitiesId.indexOf(id(ao.getAlternate1()));
+					int j = destinationEntitiesId.indexOf(id(ao.getAlternate2()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_SPECIALIZATION: {
 					SpecializationOf eo = (SpecializationOf) sb;
-					int i = originEntitiesId.indexOf(eo.getSpecificEntity().getLocalPart());
-					int j = destinationEntitiesId.indexOf(eo.getGeneralEntity().getLocalPart());
+					int i = originEntitiesId.indexOf(id(eo.getSpecificEntity()));
+					int j = destinationEntitiesId.indexOf(id(eo.getGeneralEntity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_MENTION: {
 					MentionOf mo = (MentionOf) sb;
-					int i = originEntitiesId.indexOf(mo.getSpecificEntity().getLocalPart());
-					int j = destinationEntitiesId.indexOf(mo.getGeneralEntity().getLocalPart());
+					int i = originEntitiesId.indexOf(id(mo.getSpecificEntity()));
+					int j = destinationEntitiesId.indexOf(id(mo.getGeneralEntity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
@@ -154,14 +153,14 @@ public class EntityEntity implements ProvMatrix {
 	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
-	
+
 	@Override
 	public String getRowDimentionName() {
 		return ProvMatrix.PROV_ENTITY;
 	}
 
 	@Override
-	public String getRowDimentionAbbreviate() {		
+	public String getRowDimentionAbbreviate() {
 		return ProvMatrix.PROV_ABBREVIATE_ENTITY;
 	}
 

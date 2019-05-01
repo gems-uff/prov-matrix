@@ -18,7 +18,7 @@ import org.openprovenance.prov.model.WasAssociatedWith;
  * Represents Activity -> Agent : wasAssociatedWith
  *
  */
-public class ActivityAgent implements ProvMatrix {
+public class ActivityAgent extends BasicProv implements ProvMatrix {
 
 	private CRSMatrix matrix;
 	private Relation relation;
@@ -28,8 +28,8 @@ public class ActivityAgent implements ProvMatrix {
 
 	public ActivityAgent() {
 		this.relation = Relation.RELATION_ASSOCIATION;
-		this.agentsId = new ArrayList<>();
 		this.activitiesId = new ArrayList<>();
+		this.agentsId = new ArrayList<>();
 		this.matrix = new CRSMatrix();
 	}
 
@@ -41,13 +41,13 @@ public class ActivityAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
-				activitiesId.add(ac.getId().getLocalPart());
+				activitiesId.add(id(ac.getId()));
 			} else if (sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
-				agentsId.add(ag.getId().getLocalPart());
+				agentsId.add(id(ag.getId()));
 			}
 		}
-		matrix = new CRSMatrix(agentsId.size(), activitiesId.size());
+		matrix = new CRSMatrix(activitiesId.size(), agentsId.size());
 	}
 
 	public void buildMatrix() {
@@ -56,8 +56,8 @@ public class ActivityAgent implements ProvMatrix {
 			StatementOrBundle sb = iterator.next();
 			if (sb.getKind() == this.relation.getKind()) {
 				WasAssociatedWith wa = (WasAssociatedWith) sb;
-				int i = activitiesId.indexOf(wa.getActivity().getLocalPart());
-				int j = agentsId.indexOf(wa.getAgent().getLocalPart());
+				int i = activitiesId.indexOf(id(wa.getActivity()));
+				int j = agentsId.indexOf(id(wa.getAgent()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 			}
 		}
