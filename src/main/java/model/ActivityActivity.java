@@ -139,4 +139,24 @@ public class ActivityActivity implements ProvMatrix {
 		this.relation = relation;
 	}
 
+	@Override
+	public String getRowDimentionName() {
+		return ProvMatrix.PROV_ACTIVITY;
+	}
+
+	@Override
+	public String getRowDimentionAbbreviate() {		
+		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+	}
+
+	@Override
+	public String getColumnDimentionName() {
+		return ProvMatrix.PROV_ACTIVITY;
+	}
+
+	@Override
+	public String getColumnDimentionAbbreviate() {
+		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+	}
+
 }

@@ -105,5 +105,25 @@ public class ActivityAgent implements ProvMatrix {
 	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
+	
+	@Override
+	public String getRowDimentionName() {
+		return ProvMatrix.PROV_ACTIVITY;
+	}
+
+	@Override
+	public String getRowDimentionAbbreviate() {		
+		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+	}
+
+	@Override
+	public String getColumnDimentionName() {
+		return ProvMatrix.PROV_AGENT;
+	}
+
+	@Override
+	public String getColumnDimentionAbbreviate() {
+		return ProvMatrix.PROV_ABBREVIATE_AGENT;
+	}
 
 }

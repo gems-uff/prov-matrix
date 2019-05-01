@@ -154,5 +154,25 @@ public class EntityEntity implements ProvMatrix {
 	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
+	
+	@Override
+	public String getRowDimentionName() {
+		return ProvMatrix.PROV_ENTITY;
+	}
+
+	@Override
+	public String getRowDimentionAbbreviate() {		
+		return ProvMatrix.PROV_ABBREVIATE_ENTITY;
+	}
+
+	@Override
+	public String getColumnDimentionName() {
+		return ProvMatrix.PROV_ENTITY;
+	}
+
+	@Override
+	public String getColumnDimentionAbbreviate() {
+		return ProvMatrix.PROV_ABBREVIATE_ENTITY;
+	}
 
 }
