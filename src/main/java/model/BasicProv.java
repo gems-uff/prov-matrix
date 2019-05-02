@@ -13,6 +13,8 @@ public class BasicProv {
 				} else {
 					id = qn.getPrefix() + ":" + qn.getLocalPart();
 				}
+			} else {
+				id = qn.getLocalPart();
 			}
 		}
 		return id;
