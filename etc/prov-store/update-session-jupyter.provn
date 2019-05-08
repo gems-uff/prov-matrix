@@ -1,0 +1,24 @@
+document
+    prefix vargen <http://openprovenance.org/vargen#>
+    prefix dare <http://project-dare.eu/ns#>
+    prefix vcard <http://www.w3.org/2006/vcard/ns#>
+    prefix var <http://openprovenance.org/var#>
+    prefix tmpl <http://openprovenance.org/tmpl#>
+    prefix dcterms <http://purl.org/dc/terms/>
+    
+    entity(var:libList, [dare:version='var:version', prov:type='prov:Plan', prov:value='var:liblistvalue'])
+    used(var:updateLibraries, var:libList, -)
+    wasAssociatedWith(var:updateLibraries, var:updateAgent, -)
+    wasDerivedFrom(var:Jupyter, var:JupyterPrev, -, -, -)
+    activity(var:updateLibraries, -, -, [tmpl:startTime='var:updateLibrariesStartTime', prov:type='var:updateMethod', tmpl:endTime='var:updateLibrariesEndTime'])
+    actedOnBehalfOf(var:updateAgent, var:user, -)
+    agent(var:user, [vcard:uid='var:name', dare:authMode='var:authmode', dare:group='var:group', prov:type='prov:Person', prov:type='dare:Person'])
+    agent(var:updateAgent, [vcard:uid='var:name_api', prov:type='prov:SoftwareAgent'])
+    wasGeneratedBy(var:Jupyter, var:updateLibraries, -)
+    hadMember(var:Jupyter, var:libs)
+    hadMember(var:libs, var:lib)
+    entity(var:Jupyter, [prov:generatedAt='var:generatedAt', prov:atLocation='var:accessurl', dare:sessionId='var:sessionId', dare:ComputationalContext='var:contextId', prov:type='dare:Session', dare:computationalInstance='var:computationalInstance'])
+    entity(var:JupyterPrev)
+    entity(var:lib, [dare:libname='var:libname', dare:version='var:libversion', dare:installationMode='var:installationMode', prov:type='var:libProvType'])
+    entity(var:libs, [prov:type='dare:LibCollection'])
+endDocument
