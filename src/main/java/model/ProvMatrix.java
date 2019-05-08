@@ -15,49 +15,49 @@ public interface ProvMatrix {
 	public static final String PROV_ABBREVIATE_ACTIVITY = "Ac";
 
 	public static final String PROV_USAGE = "used";
-	public static final String PROV_ABBREVIATE_USAGE = "USD";
+	public static final String PROV_ABBREVIATE_USAGE = "U S D";
 
 	public static final String PROV_GENERATION = "wasGeneratedBy";
-	public static final String PROV_ABBREVIATE_GENERATION = "WGB";
+	public static final String PROV_ABBREVIATE_GENERATION = "W G B";
 
 	public static final String PROV_INVALIDATION = "wasInvalidatedBy";
-	public static final String PROV_ABBREVIATE_INVALIDATION = "WVB";
+	public static final String PROV_ABBREVIATE_INVALIDATION = "W V B";
 
 	public static final String PROV_START = "started";
-	public static final String PROV_ABBREVIATE_START = "STD";
+	public static final String PROV_ABBREVIATE_START = "S T D";
 
 	public static final String PROV_END = "ended";
-	public static final String PROV_ABBREVIATE_END = "END";
+	public static final String PROV_ABBREVIATE_END = "E N D ";
 
 	public static final String PROV_COMMUNICATION = "wasInformedBy";
-	public static final String PROV_ABBREVIATE_COMMUNICATION = "WFB";
+	public static final String PROV_ABBREVIATE_COMMUNICATION = "W F B";
 
-	public static final String PROV_DERIVATION = "wasDerivedBy";
-	public static final String PROV_ABBREVIATE_DERIVATION = "WDB";
+	public static final String PROV_DERIVATION = "wasDerivedFrom";
+	public static final String PROV_ABBREVIATE_DERIVATION = "W D F";
 
 	public static final String PROV_ASSOCIATION = "wasAssociatedWith";
-	public static final String PROV_ABBREVIATE_ASSOCIATION = "WAW";
+	public static final String PROV_ABBREVIATE_ASSOCIATION = "W A W";
 
 	public static final String PROV_ATTRIBUTION = "wasAttributedTo";
-	public static final String PROV_ABBREVIATE_ATTRIBUTION = "WAT";
+	public static final String PROV_ABBREVIATE_ATTRIBUTION = "W A T";
 
 	public static final String PROV_DELEGATION = "actedOnBehalfOf";
-	public static final String PROV_ABBREVIATE_DELEGATION = "AOA";
+	public static final String PROV_ABBREVIATE_DELEGATION = "A OB";
 
 	public static final String PROV_INFLUENCE = "wasInfluencedBy";
-	public static final String PROV_ABBREVIATE_INFLUENCE = "WIB";
+	public static final String PROV_ABBREVIATE_INFLUENCE = "W I B";
 
 	public static final String PROV_ALTERNATE = "alternateOf";
-	public static final String PROV_ABBREVIATE_ALTERNATE = "AOF";
+	public static final String PROV_ABBREVIATE_ALTERNATE = "A OF";
 
 	public static final String PROV_SPECIALIZATION = "specializationOf";
-	public static final String PROV_ABBREVIATE_SPECIALIZATION = "SOF";
+	public static final String PROV_ABBREVIATE_SPECIALIZATION = "S OF";
 
 	public static final String PROV_MENTION = "mentionOf";
-	public static final String PROV_ABBREVIATE_MENTION = "MOF";
+	public static final String PROV_ABBREVIATE_MENTION = "M OF";
 
 	public static final String PROV_MEMBERSHIP = "hadMember";
-	public static final String PROV_ABBREVIATE_MEMBERSHIP = "HMB";
+	public static final String PROV_ABBREVIATE_MEMBERSHIP = "H M B";
 
 	public CRSMatrix getMatrix();
 

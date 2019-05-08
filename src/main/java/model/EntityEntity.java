@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,7 +9,9 @@ import org.la4j.matrix.sparse.CRSMatrix;
 import org.openprovenance.prov.model.AlternateOf;
 import org.openprovenance.prov.model.Document;
 import org.openprovenance.prov.model.Entity;
+import org.openprovenance.prov.model.HadMember;
 import org.openprovenance.prov.model.MentionOf;
+import org.openprovenance.prov.model.QualifiedName;
 import org.openprovenance.prov.model.SpecializationOf;
 import org.openprovenance.prov.model.StatementOrBundle;
 import org.openprovenance.prov.model.StatementOrBundle.Kind;
@@ -53,6 +56,8 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 				destinationEntitiesId.add(id(et.getId()));
 			}
 		}
+		Collections.sort(this.originEntitiesId);
+		Collections.sort(this.destinationEntitiesId);
 		matrix = new CRSMatrix(originEntitiesId.size(), destinationEntitiesId.size());
 	}
 
@@ -95,6 +100,16 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 					int i = originEntitiesId.indexOf(id(mo.getSpecificEntity()));
 					int j = destinationEntitiesId.indexOf(id(mo.getGeneralEntity()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
+					break;
+				}
+				case PROV_MEMBERSHIP: {
+					HadMember hm = (HadMember) sb;
+					List<QualifiedName> members = hm.getEntity();
+					for (QualifiedName member : members) {
+						int i = originEntitiesId.indexOf(id(member));
+						int j = destinationEntitiesId.indexOf(id(hm.getCollection()));
+						matrix.set(i, j, matrix.get(i, j) + 1);
+					}
 					break;
 				}
 				default:

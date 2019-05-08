@@ -66,6 +66,10 @@ public class ProvMatrixFactory {
 		ee5.setRelation(Relation.RELATION_MENTION);
 		ee5.buildMatrix();
 		matrices.add(ee5);
+		EntityEntity ee6 = new EntityEntity(this.document);
+		ee6.setRelation(Relation.RELATION_MEMBERSHIP);
+		ee6.buildMatrix();
+		matrices.add(ee6);
 
 		EntityActivity eac1 = new EntityActivity(this.document);
 		eac1.setRelation(Relation.RELATION_GENERATION);
