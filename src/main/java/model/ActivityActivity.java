@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,6 +52,8 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 				destinationActivitiesId.add(id(ac.getId()));
 			}
 		}
+		Collections.sort(this.originActivitiesId);
+		Collections.sort(this.destinationActivitiesId);
 		matrix = new CRSMatrix(originActivitiesId.size(), destinationActivitiesId.size());
 	}
 

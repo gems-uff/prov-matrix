@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,6 +49,8 @@ public class EntityAgent extends BasicProv implements ProvMatrix {
 				agentsId.add(id(ag.getId()));
 			}
 		}
+		Collections.sort(this.entitiesId);
+		Collections.sort(this.agentsId);
 		matrix = new CRSMatrix(entitiesId.size(), agentsId.size());
 	}
 
