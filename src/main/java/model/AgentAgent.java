@@ -40,7 +40,7 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_AGENT) {
+			if (sb!=null && sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
 				originAgentsId.add(id(ag.getId()));
 				destinationAgentsId.add(id(ag.getId()));
@@ -55,7 +55,7 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == this.relation.getKind()) {
+			if (sb!=null && sb.getKind() == this.relation.getKind()) {
 				ActedOnBehalfOf wd = (ActedOnBehalfOf) sb;
 				int i = originAgentsId.indexOf(id(wd.getDelegate()));
 				int j = destinationAgentsId.indexOf(id(wd.getResponsible()));

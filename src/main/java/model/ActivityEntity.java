@@ -41,10 +41,10 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ACTIVITY) {
+			if (sb!=null && sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
 				activitiesId.add(id(ac.getId()));
-			} else if (sb.getKind() == Kind.PROV_ENTITY) {
+			} else if (sb!=null && sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
 				entitiesId.add(id(et.getId()));
 			}
@@ -58,7 +58,7 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == this.relation.getKind()) {
+			if (sb!=null && sb.getKind() == this.relation.getKind()) {
 				Used used = (Used) sb;
 				int i = activitiesId.indexOf(id(used.getActivity()));
 				int j = entitiesId.indexOf(id(used.getEntity()));

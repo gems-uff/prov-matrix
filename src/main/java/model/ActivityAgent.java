@@ -40,10 +40,10 @@ public class ActivityAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ACTIVITY) {
+			if (sb!=null && sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
 				activitiesId.add(id(ac.getId()));
-			} else if (sb.getKind() == Kind.PROV_AGENT) {
+			} else if (sb!=null && sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
 				agentsId.add(id(ag.getId()));
 			}
@@ -57,7 +57,7 @@ public class ActivityAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == this.relation.getKind()) {
+			if (sb!=null && sb.getKind() == this.relation.getKind()) {
 				WasAssociatedWith wa = (WasAssociatedWith) sb;
 				int i = activitiesId.indexOf(id(wa.getActivity()));
 				int j = agentsId.indexOf(id(wa.getAgent()));

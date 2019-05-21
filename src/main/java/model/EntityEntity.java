@@ -21,7 +21,8 @@ import org.openprovenance.prov.model.WasInfluencedBy;
 /**
  * @author Victor
  * 
- * Represents Entity -> Entity : wasDerivedFrom || 	wasInfluencedBy || alternateOf || specializationOf || mentionOf || hadMember
+ *         Represents Entity -> Entity : wasDerivedFrom || wasInfluencedBy ||
+ *         alternateOf || specializationOf || mentionOf || hadMember
  *
  */
 public class EntityEntity extends BasicProv implements ProvMatrix {
@@ -50,7 +51,7 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ENTITY) {
+			if (sb != null && sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
 				originEntitiesId.add(id(et.getId()));
 				destinationEntitiesId.add(id(et.getId()));
@@ -64,9 +65,8 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (StatementOrBundle sb : sbs) {
-			Kind k = sb.getKind();
-			if (k == this.relation.getKind()) {
-				switch (k) {
+			if (sb != null && sb!=null && sb.getKind() == this.relation.getKind()) {
+				switch (sb.getKind()) {
 				case PROV_DERIVATION: {
 					WasDerivedFrom wd = (WasDerivedFrom) sb;
 					int i = originEntitiesId.indexOf(id(wd.getGeneratedEntity()));

@@ -17,7 +17,8 @@ import org.openprovenance.prov.model.WasStartedBy;
 /**
  * @author Victor
  * 
- * Represents Activity -> Activity : WasInformedBy || WasStartedBy || WasEndedBy 
+ *         Represents Activity -> Activity : WasInformedBy || WasStartedBy ||
+ *         WasEndedBy
  *
  */
 public class ActivityActivity extends BasicProv implements ProvMatrix {
@@ -46,7 +47,7 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ACTIVITY) {
+			if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
 				Activity ac = (Activity) sb;
 				originActivitiesId.add(id(ac.getId()));
 				destinationActivitiesId.add(id(ac.getId()));
@@ -61,9 +62,9 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			Kind k = sb.getKind();
-			if (k == this.relation.getKind()) {
-				switch (k) {
+
+			if (sb != null && sb.getKind() == this.relation.getKind()) {
+				switch (sb.getKind()) {
 				case PROV_COMMUNICATION: {
 					WasInformedBy wi = (WasInformedBy) sb;
 					int i = originActivitiesId.indexOf(id(wi.getInformed()));
@@ -73,15 +74,15 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 				}
 				case PROV_START: {
 					WasStartedBy ws = (WasStartedBy) sb;
-					int i = originActivitiesId.indexOf(id(ws.getTrigger()));
-					int j = destinationActivitiesId.indexOf(id(ws.getActivity()));
+					int i = originActivitiesId.indexOf(id(ws.getActivity()));
+					int j = destinationActivitiesId.indexOf(id(ws.getTrigger()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
 				case PROV_END: {
 					WasEndedBy we = (WasEndedBy) sb;
-					int i = originActivitiesId.indexOf(id(we.getTrigger()));
-					int j = destinationActivitiesId.indexOf(id(we.getActivity()));
+					int i = originActivitiesId.indexOf(id(we.getActivity()));
+					int j = destinationActivitiesId.indexOf(id(we.getTrigger()));
 					matrix.set(i, j, matrix.get(i, j) + 1);
 					break;
 				}
@@ -148,7 +149,7 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 	}
 
 	@Override
-	public String getRowDimentionAbbreviate() {		
+	public String getRowDimentionAbbreviate() {
 		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
 	}
 

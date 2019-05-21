@@ -41,10 +41,10 @@ public class EntityAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == Kind.PROV_ENTITY) {
+			if (sb!=null && sb.getKind() == Kind.PROV_ENTITY) {
 				Entity et = (Entity) sb;
 				entitiesId.add(id(et.getId()));
-			} else if (sb.getKind() == Kind.PROV_AGENT) {
+			} else if (sb!=null && sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
 				agentsId.add(id(ag.getId()));
 			}
@@ -58,7 +58,7 @@ public class EntityAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb.getKind() == this.relation.getKind()) {
+			if (sb!=null && sb.getKind() == this.relation.getKind()) {
 				WasAttributedTo wa = (WasAttributedTo) sb;
 				int i = entitiesId.indexOf(id(wa.getEntity()));
 				int j = agentsId.indexOf(id(wa.getAgent()));
