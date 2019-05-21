@@ -10,8 +10,8 @@ public class ProvnToSVG {
 
 	public static void main(String[] args) {
 		InteropFramework intF = new InteropFramework();
-		Document document = intF.readDocumentFromFile("etc/project-management.provn");
-		intF.writeDocument("etc/project-management.svg", document);
+		Document document = intF.readDocumentFromFile("etc/prov-dominoes.provn");
+		intF.writeDocument("etc/prov-dominoes.svg", document);
 
 	}
 
