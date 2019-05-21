@@ -1,15 +1,5 @@
-JNIGPUMatrix/target/
-JNIGPUMatrix/.settings/
-
-Dominoes/target/
-Dominoes/.settings/
-
-DominoesLib/target/
-DominoesLib/.settings/
-
-gitdataminer/target/
-gitdataminer/.settings/
-
+target/
+.settings/
 .classpath
 .project
 
