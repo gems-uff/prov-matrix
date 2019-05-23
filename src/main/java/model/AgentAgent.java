@@ -8,14 +8,16 @@ import java.util.List;
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.openprovenance.prov.model.ActedOnBehalfOf;
 import org.openprovenance.prov.model.Agent;
+import org.openprovenance.prov.model.Bundle;
 import org.openprovenance.prov.model.Document;
+import org.openprovenance.prov.model.Statement;
 import org.openprovenance.prov.model.StatementOrBundle;
 import org.openprovenance.prov.model.StatementOrBundle.Kind;
 
 /**
  * @author Victor
  * 
- * Represents Agent -> Agent : actedOnBehalfOf
+ *         Represents Agent -> Agent : actedOnBehalfOf
  *
  */
 public class AgentAgent extends BasicProv implements ProvMatrix {
@@ -40,7 +42,7 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb!=null && sb.getKind() == Kind.PROV_AGENT) {
+			if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
 				Agent ag = (Agent) sb;
 				originAgentsId.add(id(ag.getId()));
 				destinationAgentsId.add(id(ag.getId()));
@@ -55,12 +57,27 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb!=null && sb.getKind() == this.relation.getKind()) {
-				ActedOnBehalfOf wd = (ActedOnBehalfOf) sb;
-				int i = originAgentsId.indexOf(id(wd.getDelegate()));
-				int j = destinationAgentsId.indexOf(id(wd.getResponsible()));
-				matrix.set(i, j, matrix.get(i, j) + 1);
+			if (sb instanceof Statement) {
+				processStatement(sb);
+			} else {
+				Bundle bundle = (Bundle) sb;
+				processStatements(bundle.getStatement());
 			}
+		}
+	}
+
+	private void processStatements(List<Statement> statements) {
+		for (Iterator<Statement> iterator = statements.iterator(); iterator.hasNext();) {
+			processStatement(iterator.next());
+		}
+	}
+
+	private void processStatement(StatementOrBundle sb) {
+		if (sb != null && sb.getKind() == this.relation.getKind()) {
+			ActedOnBehalfOf wd = (ActedOnBehalfOf) sb;
+			int i = originAgentsId.indexOf(id(wd.getDelegate()));
+			int j = destinationAgentsId.indexOf(id(wd.getResponsible()));
+			matrix.set(i, j, matrix.get(i, j) + 1);
 		}
 	}
 
@@ -113,14 +130,14 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
-	
+
 	@Override
 	public String getRowDimentionName() {
 		return ProvMatrix.PROV_AGENT;
 	}
 
 	@Override
-	public String getRowDimentionAbbreviate() {		
+	public String getRowDimentionAbbreviate() {
 		return ProvMatrix.PROV_ABBREVIATE_AGENT;
 	}
 

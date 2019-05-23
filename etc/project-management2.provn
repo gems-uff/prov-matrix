@@ -115,6 +115,7 @@ document
 	wasAssociatedWith(write,Daniel,-)
 	wasAssociatedWith(write,David,-)
 	wasAssociatedWith(write,Victor,-)
+	wasAssociatedWith(write,Victor,-)
 	wasDerivedFrom(feature1,rf3)
 	wasDerivedFrom(feature2,rf3)
 	wasDerivedFrom(feature3,rf1)
