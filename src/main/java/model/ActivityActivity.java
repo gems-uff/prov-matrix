@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.openprovenance.prov.model.Activity;
+import org.openprovenance.prov.model.Bundle;
 import org.openprovenance.prov.model.Document;
+import org.openprovenance.prov.model.Statement;
 import org.openprovenance.prov.model.StatementOrBundle;
 import org.openprovenance.prov.model.StatementOrBundle.Kind;
 import org.openprovenance.prov.model.WasEndedBy;
@@ -47,10 +49,11 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
-				Activity ac = (Activity) sb;
-				originActivitiesId.add(id(ac.getId()));
-				destinationActivitiesId.add(id(ac.getId()));
+			if (sb instanceof Statement) {
+				buildIndex(sb);
+			} else {
+				Bundle bundle = (Bundle) sb;
+				buildBundleIndex(bundle.getStatement());
 			}
 		}
 		Collections.sort(this.originActivitiesId);
@@ -58,37 +61,65 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		matrix = new CRSMatrix(originActivitiesId.size(), destinationActivitiesId.size());
 	}
 
+	private void buildIndex(StatementOrBundle sb) {
+		if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
+			Activity ac = (Activity) sb;
+			originActivitiesId.add(id(ac.getId()));
+			destinationActivitiesId.add(id(ac.getId()));
+		}
+	}
+	
+	private void buildBundleIndex(List<Statement> statements) {
+		for (Iterator<Statement> iterator = statements.iterator(); iterator.hasNext();) {
+			buildIndex(iterator.next());
+		}
+	}
+
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
+			if (sb instanceof Statement) {
+				processStatement(sb);
+			} else {
+				Bundle bundle = (Bundle) sb;
+				processStatements(bundle.getStatement());
+			}
+		}
+	}
+	
+	private void processStatements(List<Statement> statements) {
+		for (Iterator<Statement> iterator = statements.iterator(); iterator.hasNext();) {
+			processStatement(iterator.next());
+		}
+	}
 
-			if (sb != null && sb.getKind() == this.relation.getKind()) {
-				switch (sb.getKind()) {
-				case PROV_COMMUNICATION: {
-					WasInformedBy wi = (WasInformedBy) sb;
-					int i = originActivitiesId.indexOf(id(wi.getInformed()));
-					int j = destinationActivitiesId.indexOf(id(wi.getInformant()));
-					matrix.set(i, j, matrix.get(i, j) + 1);
-					break;
-				}
-				case PROV_START: {
-					WasStartedBy ws = (WasStartedBy) sb;
-					int i = originActivitiesId.indexOf(id(ws.getActivity()));
-					int j = destinationActivitiesId.indexOf(id(ws.getTrigger()));
-					matrix.set(i, j, matrix.get(i, j) + 1);
-					break;
-				}
-				case PROV_END: {
-					WasEndedBy we = (WasEndedBy) sb;
-					int i = originActivitiesId.indexOf(id(we.getActivity()));
-					int j = destinationActivitiesId.indexOf(id(we.getTrigger()));
-					matrix.set(i, j, matrix.get(i, j) + 1);
-					break;
-				}
-				default:
-					break;
-				}
+	private void processStatement(StatementOrBundle sb) {
+		if (sb != null && sb.getKind() == this.relation.getKind()) {
+			switch (sb.getKind()) {
+			case PROV_COMMUNICATION: {
+				WasInformedBy wi = (WasInformedBy) sb;
+				int i = originActivitiesId.indexOf(id(wi.getInformed()));
+				int j = destinationActivitiesId.indexOf(id(wi.getInformant()));
+				matrix.set(i, j, matrix.get(i, j) + 1);
+				break;
+			}
+			case PROV_START: {
+				WasStartedBy ws = (WasStartedBy) sb;
+				int i = originActivitiesId.indexOf(id(ws.getActivity()));
+				int j = destinationActivitiesId.indexOf(id(ws.getTrigger()));
+				matrix.set(i, j, matrix.get(i, j) + 1);
+				break;
+			}
+			case PROV_END: {
+				WasEndedBy we = (WasEndedBy) sb;
+				int i = originActivitiesId.indexOf(id(we.getActivity()));
+				int j = destinationActivitiesId.indexOf(id(we.getTrigger()));
+				matrix.set(i, j, matrix.get(i, j) + 1);
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}

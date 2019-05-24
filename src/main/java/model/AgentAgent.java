@@ -42,15 +42,30 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
-				Agent ag = (Agent) sb;
-				originAgentsId.add(id(ag.getId()));
-				destinationAgentsId.add(id(ag.getId()));
+			if (sb instanceof Statement) {
+				buildIndex(sb);
+			} else {
+				Bundle bundle = (Bundle) sb;
+				buildBundleIndex(bundle.getStatement());
 			}
 		}
 		Collections.sort(this.originAgentsId);
 		Collections.sort(this.destinationAgentsId);
 		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
+	}
+	
+	private void buildIndex(StatementOrBundle sb) {
+		if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
+			Agent ag = (Agent) sb;
+			originAgentsId.add(id(ag.getId()));
+			destinationAgentsId.add(id(ag.getId()));
+		}
+	}
+	
+	private void buildBundleIndex(List<Statement> statements) {
+		for (Iterator<Statement> iterator = statements.iterator(); iterator.hasNext();) {
+			buildIndex(iterator.next());
+		}
 	}
 
 	public void buildMatrix() {
