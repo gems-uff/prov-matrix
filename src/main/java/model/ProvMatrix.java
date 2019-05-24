@@ -23,10 +23,10 @@ public interface ProvMatrix {
 	public static final String PROV_INVALIDATION = "wasInvalidatedBy";
 	public static final String PROV_ABBREVIATE_INVALIDATION = "W V B";
 
-	public static final String PROV_START = "started";
+	public static final String PROV_START = "wasStartedBy";
 	public static final String PROV_ABBREVIATE_START = "S T D";
 
-	public static final String PROV_END = "ended";
+	public static final String PROV_END = "wasEndedBy";
 	public static final String PROV_ABBREVIATE_END = "E N D ";
 
 	public static final String PROV_COMMUNICATION = "wasInformedBy";

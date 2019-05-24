@@ -42,10 +42,13 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		List<StatementOrBundle> sbs = d.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
-				Agent ag = (Agent) sb;
-				originAgentsId.add(id(ag.getId()));
-				destinationAgentsId.add(id(ag.getId()));
+			if (sb != null) {
+				if (sb instanceof Statement) {
+					buildIndex(sb);
+				} else {
+					Bundle bundle = (Bundle) sb;
+					buildBundleIndex(bundle.getStatement());
+				}
 			}
 		}
 		Collections.sort(this.originAgentsId);
@@ -53,15 +56,37 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
 	}
 
+	public AgentAgent(List<String> agentsList) {
+		this.originAgentsId = agentsList;
+		this.destinationAgentsId = agentsList;
+		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
+	}
+
+	private void buildIndex(StatementOrBundle sb) {
+		if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
+			Agent ag = (Agent) sb;
+			originAgentsId.add(id(ag.getId()));
+			destinationAgentsId.add(id(ag.getId()));
+		}
+	}
+
+	private void buildBundleIndex(List<Statement> statements) {
+		for (Iterator<Statement> iterator = statements.iterator(); iterator.hasNext();) {
+			buildIndex(iterator.next());
+		}
+	}
+
 	public void buildMatrix() {
 		List<StatementOrBundle> sbs = document.getStatementOrBundle();
 		for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
 			StatementOrBundle sb = iterator.next();
-			if (sb instanceof Statement) {
-				processStatement(sb);
-			} else {
-				Bundle bundle = (Bundle) sb;
-				processStatements(bundle.getStatement());
+			if (sb != null) {
+				if (sb instanceof Statement) {
+					processStatement(sb);
+				} else {
+					Bundle bundle = (Bundle) sb;
+					processStatements(bundle.getStatement());
+				}
 			}
 		}
 	}
@@ -149,6 +174,20 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 	@Override
 	public String getColumnDimentionAbbreviate() {
 		return ProvMatrix.PROV_ABBREVIATE_AGENT;
+	}
+
+	public void add(String src, String dest) {
+		int i = this.originAgentsId.indexOf(src);
+		int j = this.destinationAgentsId.indexOf(dest);
+		if (i == -1) {
+			this.originAgentsId.add(src);
+			i = this.originAgentsId.indexOf(src);
+		}
+		if (j == -1) {
+			this.destinationAgentsId.add(dest);
+			j = this.destinationAgentsId.indexOf(dest);
+		}
+		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}
 
 }
