@@ -1,0 +1,15 @@
+document
+	prefix cb <http://www.cordonbleu.edu>
+	
+	entity(cb:Milk)
+	entity(cb:Butter)
+	entity(cb:Fair)
+	entity(cb:Oil)
+	entity(cb:WastedOil)
+	entity(cb:WorthlessOil)
+	wasDerivedFrom(cb:Butter,cb:Milk)
+	wasDerivedFrom(cb:Fair,cb:Butter)
+	wasDerivedFrom(cb:Oil,cb:Fair)
+	wasDerivedFrom(cb:WastedOil,cb:Oil)
+	wasDerivedFrom(cb:WorthlessOil,cb:WastedOil)
+endDocument
