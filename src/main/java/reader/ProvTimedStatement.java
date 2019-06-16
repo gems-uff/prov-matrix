@@ -2,6 +2,8 @@ package reader;
 
 public class ProvTimedStatement extends ProvStatement{
 	
+	private String time;
+	
 	public ProvTimedStatement() {
 		super();
 	}
@@ -14,7 +16,6 @@ public class ProvTimedStatement extends ProvStatement{
 		super(name, src, dst);
 	}
 
-	private String time;
 
 	public String getTime() {
 		return time;

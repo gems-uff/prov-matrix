@@ -28,11 +28,6 @@
 			<artifactId>la4j</artifactId>
 			<version>0.4.9</version>
 		</dependency>
-		<dependency>
-			<groupId>uff</groupId>
-			<artifactId>prov-viewer</artifactId>
-			<version>1.2_Beta</version>
-		</dependency>
 	</dependencies>
 
 	<build>

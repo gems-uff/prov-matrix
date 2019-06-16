@@ -1,5 +1,5 @@
 package convertion;
-
+/*
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,10 +24,10 @@ import model.EntityActivity;
 import model.EntityAgent;
 import model.EntityEntity;
 import model.ProvMatrix;
-import model.ProvMatrix.Relation;
+import model.ProvMatrix.Relation;*/
 
 public class ProvMatrixGameFactory {
-
+/*
 	private PROVNReader pReader;
 	private ActivityActivity wasInformedBy;
 	private ActivityActivity wasStartedBy;
@@ -516,5 +516,5 @@ public class ProvMatrixGameFactory {
 	public void setWasInvalidatedBy(EntityActivity wasInvalidatedBy) {
 		this.wasInvalidatedBy = wasInvalidatedBy;
 	}
-
+*/
 }

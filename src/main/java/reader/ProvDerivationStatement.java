@@ -1,7 +1,7 @@
 package reader;
 
-public class ProvDerivationStatement extends ProvStatement{
-	
+public class ProvDerivationStatement extends ProvStatement {
+
 	private ProvActivity activity;
 	private ProvStatement usage;
 	private ProvTimedStatement generation;
