@@ -1,5 +1,9 @@
 package reader;
 
+import model.ProvActivity;
+import model.ProvType;
+import model.ProvRelation.Relation;
+
 public class ProvDerivationStatement extends ProvStatement {
 
 	private ProvActivity activity;
@@ -10,11 +14,11 @@ public class ProvDerivationStatement extends ProvStatement {
 		super();
 	}
 
-	public ProvDerivationStatement(String name, ProvElement src, ProvElement dst, String[] attributes) {
+	public ProvDerivationStatement(Relation name, ProvType src, ProvType dst, String[] attributes) {
 		super(name, src, dst, attributes);
 	}
 
-	public ProvDerivationStatement(String name, ProvElement src, ProvElement dst) {
+	public ProvDerivationStatement(Relation name, ProvType src, ProvType dst) {
 		super(name, src, dst);
 	}
 

@@ -1,5 +1,9 @@
 package reader;
 
+import model.ProvActivity;
+import model.ProvType;
+import model.ProvRelation.Relation;
+
 public class ProvDelegationStatement extends ProvStatement {
 
 	private ProvActivity activity;
@@ -8,11 +12,11 @@ public class ProvDelegationStatement extends ProvStatement {
 		super();
 	}
 
-	public ProvDelegationStatement(String name, ProvElement src, ProvElement dst, String[] attributes) {
+	public ProvDelegationStatement(Relation name, ProvType src, ProvType dst, String[] attributes) {
 		super(name, src, dst, attributes);
 	}
 
-	public ProvDelegationStatement(String name, ProvElement src, ProvElement dst) {
+	public ProvDelegationStatement(Relation name, ProvType src, ProvType dst) {
 		super(name, src, dst);
 	}
 

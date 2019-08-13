@@ -1,26 +1,36 @@
-package reader;
+package model;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-public class ProvElement {
+public class ProvType extends ProvConcept {
+
+	public static final String PROV_ENTITY = "ENTITY";
+	public static final String PROV_ABBREVIATE_ENTITY = "E";
+	public static final String PROV_AGENT = "AGENT";
+	public static final String PROV_ABBREVIATE_AGENT = "Ag";
+	public static final String PROV_ACTIVITY = "ACTIVITY";
+	public static final String PROV_ABBREVIATE_ACTIVITY = "Ac";
 
 	private String name;
-	private Map<String, String> attributes;
+	private String kind;
 
-	public ProvElement(String name) {
+	public ProvType() {
+		super();
+		this.kind = PROV_ENTITY;
+	}
+
+	public ProvType(String name) {
 		this();
 		this.name = name;
 	}
 
-	public ProvElement() {
-		super();
-		this.attributes = new HashMap<>();
+	public ProvType(String name, String kind) {
+		this(name);
+		this.kind = kind;
 	}
 
-	public ProvElement(String name, String[] attributes) {
-		this(name);
+	public ProvType(String name, String kind, String[] attributes) {
+		this(name, kind);
 		if (attributes != null) {
 			for (int i = 0; i < attributes.length; i++) {
 				String key = attributes[i].split("=")[0];
@@ -28,7 +38,7 @@ public class ProvElement {
 				if (attributes[i].split("=").length > 1) {
 					value = attributes[i].split("=")[1];
 				}
-				this.attributes.put(key, value);
+				super.getAttributes().put(key, value);
 			}
 		}
 	}
@@ -41,24 +51,16 @@ public class ProvElement {
 		this.name = name;
 	}
 
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
 	@Override
 	public String toString() {
-		String toString = "";
+		String toString = this.kind.equals(PROV_ENTITY)?"entity(":"agent(";
 		toString += this.name;
-		if (!this.attributes.isEmpty()) {
+		if (!super.getAttributes().isEmpty()) {
 			toString += ", [";
-			Set<String> keys = this.attributes.keySet();
+			Set<String> keys = super.getAttributes().keySet();
 			for (String key : keys) {
 				if (key != null) {
-					toString += key + "=" + this.attributes.get(key) + ", ";
+					toString += key + "=" + super.getAttributes().get(key) + ", ";
 				}
 			}
 			toString = toString.substring(0, toString.length() - 2);
@@ -66,6 +68,14 @@ public class ProvElement {
 		}
 		toString += ")";
 		return toString;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 
 }

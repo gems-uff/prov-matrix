@@ -59,7 +59,24 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 	public AgentAgent(List<String> agentsList) {
 		this.originAgentsId = agentsList;
 		this.destinationAgentsId = agentsList;
-		matrix = new CRSMatrix(originAgentsId.size(), destinationAgentsId.size());
+		matrix = new CRSMatrix(agentsList.size(), agentsList.size());
+	}
+	
+	public void add(List<String> agentsList) {
+		
+		if (agentsList != null) {
+			for (String ag : agentsList) {
+				if (!this.originAgentsId.contains(ag)) {
+					this.originAgentsId.add(ag);
+				}
+				if (!this.destinationAgentsId.contains(ag)) {
+					this.destinationAgentsId.add(ag);
+				}
+			}
+			if (matrix.rows()!=this.getRowDescriptors().size() || matrix.columns()!=this.getColumnDescriptors().size()) {
+				matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+			}
+		}
 	}
 
 	private void buildIndex(StatementOrBundle sb) {
@@ -158,22 +175,22 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 
 	@Override
 	public String getRowDimentionName() {
-		return ProvMatrix.PROV_AGENT;
+		return ProvType.PROV_AGENT;
 	}
 
 	@Override
 	public String getRowDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_AGENT;
+		return ProvType.PROV_ABBREVIATE_AGENT;
 	}
 
 	@Override
 	public String getColumnDimentionName() {
-		return ProvMatrix.PROV_AGENT;
+		return ProvType.PROV_AGENT;
 	}
 
 	@Override
 	public String getColumnDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_AGENT;
+		return ProvType.PROV_ABBREVIATE_AGENT;
 	}
 
 	public void add(String src, String dest) {
@@ -188,6 +205,11 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 			j = this.destinationAgentsId.indexOf(dest);
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return this.matrix.density() == 0.0;
 	}
 
 }

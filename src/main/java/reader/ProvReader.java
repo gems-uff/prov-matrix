@@ -1,3 +1,27 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2019 Victor Alencar.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package reader;
 
 import java.io.BufferedReader;
@@ -8,15 +32,20 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.ProvActivity;
+import model.ProvRelation;
+import model.ProvType;
+import model.ProvRelation.Relation;
+
 /**
  *
- * @author Victor
+ * @author Victor Alencar
  */
 public class ProvReader {
 
 	private File provFile;
-	private List<ProvElement> entities;
-	private List<ProvElement> agents;
+	private List<ProvType> entities;
+	private List<ProvType> agents;
 	private List<ProvActivity> activities;
 	private List<ProvStatement> statements;
 
@@ -54,12 +83,12 @@ public class ProvReader {
 		String[] attributes;
 		String[] optionalAttributes = null;
 
-		line = line.replace(")", "");
-		line = line.replace(" ", "");
-		line = line.replace("\t", "");
-		line = line.replace("]", "");
-		line = line.replace("'", "");
-		line = line.replace("\"", "");
+		line = line.replaceAll("\\)", "");
+		line = line.replaceAll(" ", "");
+		line = line.replaceAll("\t", "");
+		line = line.replaceAll("]", "");
+		line = line.replaceAll("'", "");
+		line = line.replaceAll("\"", "");
 		elements = line.split("\\(");
 		if (elements.length > 1) {
 			statement = elements[1].split("\\[");
@@ -69,71 +98,74 @@ public class ProvReader {
 				optionalAttributes = statement[1].split(",");
 			}
 
-			if (elements[0].contains("entity")) {
+			if (elements[0].equals(ProvType.PROV_ENTITY.toLowerCase())) {
 				readEntity(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("activity")) {
+			if (elements[0].equals(ProvType.PROV_ACTIVITY.toLowerCase())) {
 				readActivity(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("agent")) {
+			if (elements[0].equals(ProvType.PROV_AGENT.toLowerCase())) {
 				readAgent(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasGeneratedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_GENERATION)) {
 				readGeneration(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("used")) {
+			if (elements[0].equals(ProvRelation.PROV_USAGE)) {
 				readUsage(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasInformedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_COMMUNICATION)) {
 				readCommunication(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasStartedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_START)) {
 				readStart(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasEndedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_END)) {
 				readEnd(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasInvalidatedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_INVALIDATION)) {
 				readInvalidation(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasDerivedFrom")) {
+			if (elements[0].equals(ProvRelation.PROV_DERIVATION)) {
 				readDerivation(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasAttributedTo")) {
+			if (elements[0].equals(ProvRelation.PROV_ATTRIBUTION)) {
 				readAttribution(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasAssociatedWith")) {
+			if (elements[0].equals(ProvRelation.PROV_ASSOCIATION)) {
 				readAssociation(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("actedOnBehalfOf")) {
+			if (elements[0].equals(ProvRelation.PROV_DELEGATION)) {
 				readDelegation(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("wasInfluencedBy")) {
+			if (elements[0].equals(ProvRelation.PROV_INFLUENCE)) {
 				readInfluence(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("hadMember")) {
+			if (elements[0].equals(ProvRelation.PROV_MEMBERSHIP)) {
 				readMembership(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("specializationOf")) {
+			if (elements[0].equals(ProvRelation.PROV_SPECIALIZATION)) {
 				readSpecialization(attributes, optionalAttributes);
 			}
-			if (elements[0].contains("alternateOf")) {
+			if (elements[0].equals(ProvRelation.PROV_ALTERNATE)) {
 				readAlternate(attributes, optionalAttributes);
+			}
+			if (elements[0].equals(ProvRelation.PROV_MENTION)) {
+				readMention(attributes, optionalAttributes);
 			}
 		}
 	}
 
-	private ProvElement getAgent(String agent) {
-		for (ProvElement a : this.agents) {
-			if (a != null && a.getName().equals(agent)) {
-				return a;
+	private ProvType getAgent(String agent) {
+		for (ProvType ag : this.agents) {
+			if (ag != null && ag.getName().equals(agent)) {
+				return ag;
 			}
 		}
 		return null;
 	}
 
-	private ProvElement getEntity(String entity) {
-		for (ProvElement e : this.entities) {
+	private ProvType getEntity(String entity) {
+		for (ProvType e : this.entities) {
 			if (e != null && e.getName().equals(entity)) {
 				return e;
 			}
@@ -151,9 +183,9 @@ public class ProvReader {
 	}
 
 	private ProvActivity getActivity(String activity) {
-		for (ProvActivity a : this.activities) {
-			if (a != null && a.getName().equals(activity)) {
-				return a;
+		for (ProvActivity ac : this.activities) {
+			if (ac != null && ac.getName().equals(activity)) {
+				return ac;
 			}
 		}
 		return null;
@@ -161,7 +193,7 @@ public class ProvReader {
 
 	public void readEntity(String[] attributes, String[] optionalAttributes) {
 		String id = attributes[0];
-		this.entities.add(new ProvElement(id, optionalAttributes));
+		this.entities.add(new ProvType(id, ProvType.PROV_ENTITY, optionalAttributes));
 	}
 
 	public void readActivity(String[] attributes, String[] optionalAttributes) {
@@ -180,7 +212,7 @@ public class ProvReader {
 
 	public void readAgent(String[] attributes, String[] optionalAttributes) {
 		String id = attributes[0];
-		this.agents.add(new ProvElement(id, optionalAttributes));
+		this.agents.add(new ProvType(id, ProvType.PROV_AGENT, optionalAttributes));
 	}
 
 	public void readGeneration(String[] attributes, String[] optionalAttributes) {
@@ -196,7 +228,7 @@ public class ProvReader {
 			entity = get1stAttribute(attributes[0]);
 			time = "";
 		}
-		ProvTimedStatement wasGeneratedBy = new ProvTimedStatement("wasGeneratedBy", getEntity(entity),
+		ProvTimedStatement wasGeneratedBy = new ProvTimedStatement(Relation.RELATION_GENERATION, getEntity(entity),
 				getActivity(activity), optionalAttributes);
 		wasGeneratedBy.setTime(time);
 		wasGeneratedBy.setId(id);
@@ -216,8 +248,8 @@ public class ProvReader {
 			activity = get1stAttribute(attributes[0]);
 			time = "";
 		}
-		ProvTimedStatement used = new ProvTimedStatement("used", getActivity(activity), getEntity(entity),
-				optionalAttributes);
+		ProvTimedStatement used = new ProvTimedStatement(Relation.RELATION_USAGE, getActivity(activity),
+				getEntity(entity), optionalAttributes);
 		used.setTime(time);
 		used.setId(id);
 		this.statements.add(used);
@@ -230,21 +262,21 @@ public class ProvReader {
 		informed = get1stAttribute(attributes[0]);
 		informant = attributes[1];
 
-		ProvStatement wasInformedBy = new ProvStatement("wasInformedBy", getActivity(informed), getActivity(informant),
-				optionalAttributes);
+		ProvStatement wasInformedBy = new ProvStatement(Relation.RELATION_COMMUNICATION, getActivity(informed),
+				getActivity(informant), optionalAttributes);
 		wasInformedBy.setId(id);
 		this.statements.add(wasInformedBy);
 	}
 
 	public void readStart(String[] attributes, String[] optionalAttributes) {
-		starterOrEnder(attributes, optionalAttributes, "wasStartedBy");
+		starterOrEnder(attributes, optionalAttributes, Relation.RELATION_START);
 	}
 
 	public void readEnd(String[] attributes, String[] optionalAttributes) {
-		starterOrEnder(attributes, optionalAttributes, "wasEndedBy");
+		starterOrEnder(attributes, optionalAttributes, Relation.RELATION_END);
 	}
 
-	public void starterOrEnder(String[] attributes, String[] optionalAttributes, String type) {
+	public void starterOrEnder(String[] attributes, String[] optionalAttributes, Relation relation) {
 		String activity = "-";
 		String trigger = "-";
 		String starterOrEnder = "-";
@@ -260,8 +292,8 @@ public class ProvReader {
 			time = "";
 		}
 
-		ProvTriggeredStament provTrigger = new ProvTriggeredStament(type, getActivity(activity), getActivity(trigger),
-				optionalAttributes);
+		ProvTriggeredStament provTrigger = new ProvTriggeredStament(relation, getActivity(activity),
+				getActivity(trigger), optionalAttributes);
 		provTrigger.setStarterOrEnder(starterOrEnder);
 		provTrigger.setTime(time);
 		provTrigger.setId(id);
@@ -281,7 +313,7 @@ public class ProvReader {
 			entity = get1stAttribute(attributes[0]);
 			time = "";
 		}
-		ProvTimedStatement wasInvalidatedBy = new ProvTimedStatement("wasInvalidatedBy", getEntity(entity),
+		ProvTimedStatement wasInvalidatedBy = new ProvTimedStatement(Relation.RELATION_INVALIDATION, getEntity(entity),
 				getActivity(activity), optionalAttributes);
 		wasInvalidatedBy.setId(id);
 		wasInvalidatedBy.setTime(time);
@@ -298,8 +330,8 @@ public class ProvReader {
 		ProvDerivationStatement provDerivation = null;
 		generatedEntity = get1stAttribute(attributes[0]);
 		usedEntity = attributes[1];
-		provDerivation = new ProvDerivationStatement("wasDerivedBy", getEntity(generatedEntity), getEntity(usedEntity),
-				optionalAttributes);
+		provDerivation = new ProvDerivationStatement(Relation.RELATION_DERIVATION, getEntity(generatedEntity),
+				getEntity(usedEntity), optionalAttributes);
 		if (attributes.length >= 5) {
 			activity = attributes[2];
 			generation = attributes[3];
@@ -321,8 +353,8 @@ public class ProvReader {
 		entity = get1stAttribute(attributes[0]);
 		agent = attributes[1];
 
-		ProvStatement provAttribution = new ProvStatement("wasAttributedTo", getEntity(entity), getAgent(agent),
-				optionalAttributes);
+		ProvStatement provAttribution = new ProvStatement(Relation.RELATION_ATTRIBUTION, getEntity(entity),
+				getAgent(agent), optionalAttributes);
 		provAttribution.setId(id);
 		this.statements.add(provAttribution);
 	}
@@ -336,8 +368,11 @@ public class ProvReader {
 		activity = get1stAttribute(attributes[0]);
 		agent = attributes[1];
 
-		ProvStatement wasAssociatedWith = new ProvStatement("wasAssociatedWith", getAgent(agent), getActivity(activity),
-				optionalAttributes);
+		if (getAgent(agent) == null || getActivity(activity)== null) {
+			throw new RuntimeException("Agente ("+agent+") ou atividade ("+activity+") não encontrado!");
+		}
+		ProvStatement wasAssociatedWith = new ProvStatement(Relation.RELATION_ASSOCIATION, getActivity(activity),
+				getAgent(agent), optionalAttributes);
 		wasAssociatedWith.setId(id);
 		this.statements.add(wasAssociatedWith);
 	}
@@ -355,8 +390,8 @@ public class ProvReader {
 		if (attributes.length >= 3) {
 			activity = attributes[2];
 		}
-		ProvDelegationStatement actedOnBehalfOf = new ProvDelegationStatement("actedOnBehalfOf", getAgent(delegate),
-				getAgent(responsible), optionalAttributes);
+		ProvDelegationStatement actedOnBehalfOf = new ProvDelegationStatement(Relation.RELATION_DELEGATION,
+				getAgent(delegate), getAgent(responsible), optionalAttributes);
 		if (activity != null && !activity.matches("-")) {
 			actedOnBehalfOf.setActivity(getActivity(activity));
 		}
@@ -373,25 +408,30 @@ public class ProvReader {
 		influencer = get1stAttribute(attributes[0]);
 		influencee = attributes[1];
 
-		ProvStatement wasInfluencedBy = new ProvStatement("wasInfluencedBy", getEntity(influencer),
+		ProvStatement wasInfluencedBy = new ProvStatement(Relation.RELATION_INFLUENCE, getEntity(influencer),
 				getEntity(influencee), optionalAttributes);
 		wasInfluencedBy.setId(id);
 		this.statements.add(wasInfluencedBy);
 	}
 
 	public void readAlternate(String[] attributes, String[] optionalAttributes) {
-		alternateOrSpecializationOrMembership(attributes, optionalAttributes, "alternateOf");
+		alternateOrSpecializationOrMembershipMention(attributes, optionalAttributes, Relation.RELATION_ALTERNATE);
 	}
 
 	public void readSpecialization(String[] attributes, String[] optionalAttributes) {
-		alternateOrSpecializationOrMembership(attributes, optionalAttributes, "specializationOf");
+		alternateOrSpecializationOrMembershipMention(attributes, optionalAttributes, Relation.RELATION_SPECIALIZATION);
+	}
+	
+	public void readMention(String[] attributes, String[] optionalAttributes) {
+		alternateOrSpecializationOrMembershipMention(attributes, optionalAttributes, Relation.RELATION_MENTION);
 	}
 
 	public void readMembership(String[] attributes, String[] optionalAttributes) {
-		alternateOrSpecializationOrMembership(attributes, optionalAttributes, "hadMember");
+		alternateOrSpecializationOrMembershipMention(attributes, optionalAttributes, Relation.RELATION_MEMBERSHIP);
 	}
 
-	public void alternateOrSpecializationOrMembership(String[] attributes, String[] optionalAttributes, String type) {
+	public void alternateOrSpecializationOrMembershipMention(String[] attributes, String[] optionalAttributes,
+			Relation relation) {
 		String id = null;
 		String alternateSpecMember1 = "-";
 		String alternateSpecMember2;
@@ -400,10 +440,10 @@ public class ProvReader {
 		alternateSpecMember1 = get1stAttribute(attributes[0]);
 		alternateSpecMember2 = attributes[1];
 
-		ProvStatement alternateOrSpecializationOrMemberOf = new ProvStatement(type, getEntity(alternateSpecMember2),
+		ProvStatement alternateOrSpecializationOrMemberOforMentionOf = new ProvStatement(relation, getEntity(alternateSpecMember2),
 				getEntity(alternateSpecMember1), optionalAttributes);
-		alternateOrSpecializationOrMemberOf.setId(id);
-		this.statements.add(alternateOrSpecializationOrMemberOf);
+		alternateOrSpecializationOrMemberOforMentionOf.setId(id);
+		this.statements.add(alternateOrSpecializationOrMemberOforMentionOf);
 	}
 
 	public String getOptionalID(String attribute) {
@@ -434,19 +474,19 @@ public class ProvReader {
 		this.provFile = provFile;
 	}
 
-	public List<ProvElement> getEntities() {
+	public List<ProvType> getEntities() {
 		return entities;
 	}
 
-	public void setEntities(List<ProvElement> entities) {
+	public void setEntities(List<ProvType> entities) {
 		this.entities = entities;
 	}
 
-	public List<ProvElement> getAgents() {
+	public List<ProvType> getAgents() {
 		return agents;
 	}
 
-	public void setAgents(List<ProvElement> agents) {
+	public void setAgents(List<ProvType> agents) {
 		this.agents = agents;
 	}
 
@@ -469,10 +509,10 @@ public class ProvReader {
 	public static void main(String[] args) throws URISyntaxException, IOException {
 		ProvReader provReader = new ProvReader("etc/project-management2.provn");
 		provReader.readFile();
-		for (ProvElement e : provReader.getEntities()) {
+		for (ProvType e : provReader.getEntities()) {
 			System.out.println("entity(" + e);
 		}
-		for (ProvElement a : provReader.getAgents()) {
+		for (ProvType a : provReader.getAgents()) {
 			System.out.println("agent(" + a);
 		}
 		for (ProvActivity a : provReader.getActivities()) {

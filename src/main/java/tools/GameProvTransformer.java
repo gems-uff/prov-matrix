@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GameProvTransformer extends InputStreamReader {
 
@@ -53,67 +51,6 @@ public class GameProvTransformer extends InputStreamReader {
 		}
 	}
 
-	public void readFile2() throws URISyntaxException, IOException {
-		BufferedReader br = new BufferedReader(new FileReader(this.input));
-		try {
-			String line = br.readLine();
-			while (line != null) {
-				String newLine = line;
-				newLine = newLine.replace("=,", "=\"\",");
-				newLine = newLine.replace(" ", "");
-				newLine = newLine.replace("(semi-static)", "");
-				newLine = newLine.replace("(Clone)", "");
-
-				Pattern pattern = Pattern.compile("=[-]\\d*[.]\\d*|\\d*[.]\\d*|=\\w*");
-				Matcher matcher = pattern.matcher(line);
-				while (matcher.find()) {
-					String oldToken = line.substring(matcher.start(), matcher.end());
-					String newToken = oldToken;
-					if (newToken.length() > 1) {
-						newToken = newToken.replace("=", "=\"");
-						newToken += "\"";
-					}
-					newLine = newLine.replace(oldToken, newToken);
-					newLine = newLine.replace("\"Spawned\"Smoke", "\"SpawnedSmoke\"");
-					newLine = newLine.replace("\"Fired\"Missile", "\"FiredMissile\"");
-					newLine = newLine.replace("\"Spawning\"Smoke", "\"SpawningSmoke\"");
-					newLine = newLine.replace("\"Taking\"Damage", "\"TakingDamage\"");
-
-					newLine = newLine.replace("\"Enemy\"Spider", "EnemySpider\"");
-					newLine = newLine.replace("\"Taking\"Hit", "\"TakingHit\"");
-					newLine = newLine.replace("\"Being\"Hit", "\"BeingHit\"");
-					newLine = newLine.replace("\"Terminal\"ForDoorFromHell_1", "\"TerminalForDoorFromHell_1\"");
-					newLine = newLine.replace("\"Terminal\"ForDoubleHellDoor3A", "\"TerminalForDoubleHellDoor3A\"");
-					newLine = newLine.replace("\"Terminal\"ForDoubleHellDoor3B", "\"TerminalForDoubleHellDoor3B\"");
-					newLine = newLine.replace("\"Terminal\"ForDoubleHellDoor_3B", "\"TerminalForDoubleHellDoor_3B\"");
-					newLine = newLine.replace("\"LockedDoor\"FromHell_1", "\"LockedDoorFromHell_1\"");
-					newLine = newLine.replace("\"LockedDoor\"FromHellDouble_3", "\"LockedDoorFromHellDouble_3\"");
-
-					newLine = newLine.replace("\"Score\"Missed", "ScoreMissed");
-					newLine = newLine.replace("\"Enemy\"Mech", "EnemyMech");
-					newLine = newLine.replace("\"(", "(");
-					newLine = newLine.replace("E-4", "");
-					newLine = newLine.replace("0\"0", "00");
-					newLine = newLine.replace("0\"2", "02\"");
-					newLine = newLine.replace("2\"7", "27");
-					newLine = newLine.replace("2\"3", "23");
-					newLine = newLine.replace("),", ")\",");
-
-				}
-				newLine = newLine.replace(",", ", ");
-				newLine = newLine.replace("\".", ".");
-				newLine = newLine.replace("=]", "=\"\"]");
-				this.fileWriter.write(newLine + "\n");
-				line = br.readLine();
-			}
-		} finally {
-			br.close();
-			this.fileWriter.flush();
-			this.fileWriter.close();
-		}
-
-	}
-
 	public String readLine(String line) {
 		String[] elements;
 		String[] statement;
@@ -130,29 +67,41 @@ public class GameProvTransformer extends InputStreamReader {
 			if (statement.length > 1) {
 				optionalAttributes = statement[1].split(",");
 			}
-			if (elements[0].contains("agent")) {
+			if (elements[0].contains("agent") && optionalAttributes != null) {
 				line = rewriteAgent(line, attributes, optionalAttributes);
-			} else if (elements[0].contains("activity")) {
+			} else if (elements[0].contains("activity") && optionalAttributes != null) {
 				line = rewriteActivity(line, attributes, optionalAttributes);
-			} else if (elements[0].contains("entity")) {
+			} else if (elements[0].contains("entity") && optionalAttributes != null) {
 				line = rewriteEntity(line, attributes, optionalAttributes);
+			} else if (elements[0].contains("wasAssociatedWith") && optionalAttributes != null) {
+				line = rewriteAssociation(line, attributes, optionalAttributes);
 			} else {
-				// line = line.replace("wasInfluencedBy", "wasInformedBy");
-				// line = line.replace("wasInformedBy(edge_1237", "wasInfluencedBy(edge_1237");
-				// line = line.replace("wasInformedBy(edge_1238", "wasInfluencedBy(edge_1238");
-				// line = line.replace("wasInformedBy(edge_495", "wasInfluencedBy(edge_495");
-
-				/*
-				 * if (line.contains("wasInformedBy(edge_1121") ||
-				 * line.contains("wasInformedBy(edge_928") ||
-				 * line.contains("wasInformedBy(edge_476")) { line = ""; }
-				 */
-				line = line.replaceFirst(",\\[.*\\]", "");
+				// line = line.replaceFirst(",\\[.*\\]", "");
 				line = updateLineIndexes(line);
 			}
 		}
 		line = line.replace("])]", "]");
 		return line;
+	}
+
+	private String rewriteAssociation(String line, String[] attributes, String[] optionalAttributes) {
+
+		String newLine = "";
+		String agentOrEntity = getAttribute("ObjectName", optionalAttributes).replace("]", "") + "_";
+		agentOrEntity += getAttribute("ObjectID", optionalAttributes).replace(".0", "").replace("\t", "").trim();
+		agentOrEntity = agentOrEntity.replace("\"", "");
+		if (getAttribute("ObjectTag", optionalAttributes).contains("Player")
+				|| getAttribute("ObjectTag", optionalAttributes).contains("Enemy")) {
+			newLine = addAgent(agentOrEntity, optionalAttributes);
+		} else {
+			newLine = addEntity(agentOrEntity, optionalAttributes);
+		}
+		if (newLine.length() > 0) {
+			newLine = newLine + line;
+		} else {
+			newLine = line;
+		}
+		return newLine;
 	}
 
 	private String updateLineIndexes(String line) {
@@ -168,13 +117,15 @@ public class GameProvTransformer extends InputStreamReader {
 
 	private String getStringAttributes(String[] atts) {
 		String stringAttributes = "[";
-		for (int i = 0; i < atts.length; i++) {
-			if (atts[i].split("=")[0].equals("Health") || atts[i].split("=")[0].equals("ObjectPosition_X")
-					|| atts[i].split("=")[0].equals("ObjectPosition_Y")
-					|| atts[i].split("=")[0].equals("ObjectPosition_Z") || atts[i].split("=")[0].equals("Timestamp")
-					|| atts[i].split("=")[0].equals("Label") || atts[i].split("=")[0].equals("ObjectName")
-					|| atts[i].split("=")[0].equals("ObjectID") || atts[i].split("=")[0].equals("ObjectTag")) {
-				stringAttributes += atts[i] + ",";
+		if (atts != null) {
+			for (int i = 0; i < atts.length; i++) {
+				if (atts[i].split("=")[0].equals("Health") || atts[i].split("=")[0].equals("ObjectPosition_X")
+						|| atts[i].split("=")[0].equals("ObjectPosition_Y")
+						|| atts[i].split("=")[0].equals("ObjectPosition_Z") || atts[i].split("=")[0].equals("Timestamp")
+						|| atts[i].split("=")[0].equals("Label") || atts[i].split("=")[0].equals("ObjectName")
+						|| atts[i].split("=")[0].equals("ObjectID") || atts[i].split("=")[0].equals("ObjectTag")) {
+					stringAttributes += atts[i] + ",";
+				}
 			}
 		}
 		stringAttributes += "]";
@@ -184,10 +135,12 @@ public class GameProvTransformer extends InputStreamReader {
 
 	private String getAttribute(String attKey, String[] atts) {
 		String attValue = "";
-		for (int i = 0; i < atts.length; i++) {
-			String[] attMap = atts[i].split("=");
-			if (attMap[0].equals(attKey)) {
-				attValue = attMap[1];
+		if (atts != null) {
+			for (int i = 0; i < atts.length; i++) {
+				String[] attMap = atts[i].split("=");
+				if (attMap[0].equals(attKey)) {
+					attValue = attMap[1];
+				}
 			}
 		}
 		return attValue;
@@ -195,8 +148,7 @@ public class GameProvTransformer extends InputStreamReader {
 
 	public String rewriteEntity(String line, String[] attributes, String[] optionalAttributes) {
 		String id = attributes[0].replace("\"", "");
-		String entity = getAttribute("ObjectName", optionalAttributes).replace("])", "")/* + "_"*/;
-		/*entity += getAttribute("ObjectID", optionalAttributes).replace(".0", "");*/
+		String entity = getAttribute("ObjectName", optionalAttributes).replace("])", "");
 		entity = entity.replace("\"", "");
 		line = "entity(" + entity + "," + getStringAttributes(optionalAttributes) + ")";
 		this.indexes.put(id, entity);
@@ -205,7 +157,6 @@ public class GameProvTransformer extends InputStreamReader {
 
 	public String rewriteAgent(String line, String[] attributes, String[] optionalAttributes) {
 		String id = attributes[0].replace("\"", "");
-		;
 		String agent = getAttribute("ObjectName", optionalAttributes).replace("])", "") + "_";
 		agent += getAttribute("ObjectID", optionalAttributes).replace(".0", "").replace("\t", "").trim();
 		agent = agent.replace("\"", "");
@@ -274,34 +225,9 @@ public class GameProvTransformer extends InputStreamReader {
 		return newLine;
 	}
 
-	public String getEdgeID(String[] att, String id) {
-		if (att.length == 2) {
-			if (att[0].equalsIgnoreCase("-")) {
-				id = "Edge_" + edgeOptionalID;
-				edgeOptionalID++;
-			} else {
-				id = att[0];
-			}
-		} else {
-			id = "Edge_" + edgeOptionalID;
-			edgeOptionalID++;
-		}
-		return id;
-	}
-
-	public String getEdge1stAttribute(String attribute, String attr) {
-		String[] att = attribute.split(";");
-		if (att.length == 2) {
-			attr = att[1];
-		} else {
-			attr = att[0];
-		}
-		return attr;
-	}
-
 	public static void main(String[] args) throws IOException, URISyntaxException {
-		GameProvTransformer pReader = new GameProvTransformer("etc/games/old/smoke-squadron-3-src.provn",
-				"etc/games/old/smoke-squadron-3-new.provn");
+		GameProvTransformer pReader = new GameProvTransformer("etc/games/angry-bots-1.provn",
+				"etc/games/angry-bots-11.provn");
 		pReader.readFile();
 		pReader.close();
 	}

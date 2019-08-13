@@ -58,9 +58,31 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 	}
 
 	public ActivityEntity(List<String> activitiesList, List<String> entitiesList) {
+		this();
 		this.activitiesId = activitiesList;
 		this.entitiesId = entitiesList;
-		matrix = new CRSMatrix(activitiesId.size(), entitiesId.size());
+		matrix = new CRSMatrix(activitiesList.size(), entitiesList.size());
+	}
+	
+	public void add(List<String> activitiesList, List<String> entitiesList) {
+		
+		if (activitiesList != null) {
+			for (String ac : activitiesList) {
+				if (!this.activitiesId.contains(ac)) {
+					this.activitiesId.add(ac);
+				}
+			}
+		}
+		if (entitiesList != null) {
+			for (String e : entitiesList) {
+				if (!this.entitiesId.contains(e)) {
+					this.entitiesId.add(e);
+				}
+			}
+		}
+		if (matrix.rows()!=this.getRowDescriptors().size() || matrix.columns()!=this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
 	}
 
 	private void buildIndex(StatementOrBundle sb) {
@@ -162,22 +184,22 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 
 	@Override
 	public String getRowDimentionName() {
-		return ProvMatrix.PROV_ACTIVITY;
+		return ProvType.PROV_ACTIVITY;
 	}
 
 	@Override
 	public String getRowDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+		return ProvType.PROV_ABBREVIATE_ACTIVITY;
 	}
 
 	@Override
 	public String getColumnDimentionName() {
-		return ProvMatrix.PROV_ENTITY;
+		return ProvType.PROV_ENTITY;
 	}
 
 	@Override
 	public String getColumnDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_ENTITY;
+		return ProvType.PROV_ABBREVIATE_ENTITY;
 	}
 
 	public void add(String src, String dest) {
@@ -192,6 +214,11 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 			j = this.entitiesId.indexOf(dest);
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return this.matrix.density() == 0.0;
 	}
 
 }

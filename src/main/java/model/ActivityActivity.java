@@ -64,10 +64,28 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 	}
 
 	public ActivityActivity(List<String> activitiesList) {
-		super();
+		this();
 		this.originActivitiesId = activitiesList;
 		this.destinationActivitiesId = activitiesList;
-		this.matrix = new CRSMatrix(originActivitiesId.size(), destinationActivitiesId.size());
+		this.matrix = new CRSMatrix(activitiesList.size(), activitiesList.size());
+	}
+
+	public void add(List<String> activitiesList) {
+
+		if (activitiesList != null) {
+			for (String ac : activitiesList) {
+				if (!this.originActivitiesId.contains(ac)) {
+					this.originActivitiesId.add(ac);
+				}
+				if (!this.destinationActivitiesId.contains(ac)) {
+					this.destinationActivitiesId.add(ac);
+				}
+			}
+			if (matrix.rows() != this.getRowDescriptors().size()
+					|| matrix.columns() != this.getColumnDescriptors().size()) {
+				matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+			}
+		}
 	}
 
 	private void buildIndex(StatementOrBundle sb) {
@@ -187,22 +205,22 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 
 	@Override
 	public String getRowDimentionName() {
-		return ProvMatrix.PROV_ACTIVITY;
+		return ProvType.PROV_ACTIVITY;
 	}
 
 	@Override
 	public String getRowDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+		return ProvType.PROV_ABBREVIATE_ACTIVITY;
 	}
 
 	@Override
 	public String getColumnDimentionName() {
-		return ProvMatrix.PROV_ACTIVITY;
+		return ProvType.PROV_ACTIVITY;
 	}
 
 	@Override
 	public String getColumnDimentionAbbreviate() {
-		return ProvMatrix.PROV_ABBREVIATE_ACTIVITY;
+		return ProvType.PROV_ABBREVIATE_ACTIVITY;
 	}
 
 	public void add(String src, String dest) {
@@ -211,12 +229,25 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		if (i == -1) {
 			this.originActivitiesId.add(src);
 			i = this.originActivitiesId.indexOf(src);
+			add(originActivitiesId);
 		}
 		if (j == -1) {
 			this.destinationActivitiesId.add(dest);
 			j = this.destinationActivitiesId.indexOf(dest);
+			add(destinationActivitiesId);
+		}
+		if (getRowDescriptors().size() != matrix.rows()) {
+			add(getRowDescriptors());
+		}
+		if (getColumnDescriptors().size() != matrix.columns()) {
+			add(getColumnDescriptors());
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.matrix.density() == 0.0;
 	}
 
 }

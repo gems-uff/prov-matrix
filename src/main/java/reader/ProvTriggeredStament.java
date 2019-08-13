@@ -1,5 +1,8 @@
 package reader;
 
+import model.ProvType;
+import model.ProvRelation.Relation;
+
 public class ProvTriggeredStament extends ProvTimedStatement {
 	
 	private String trigger;
@@ -9,12 +12,12 @@ public class ProvTriggeredStament extends ProvTimedStatement {
 		super();
 	}
 
-	public ProvTriggeredStament(String name, ProvElement src, ProvElement dst, String[] attributes) {
-		super(name, src, dst, attributes);
+	public ProvTriggeredStament(Relation relation, ProvType src, ProvType dst, String[] attributes) {
+		super(relation, src, dst, attributes);
 	}
 
-	public ProvTriggeredStament(String name, ProvElement src, ProvElement dst) {
-		super(name, src, dst);
+	public ProvTriggeredStament(Relation relation, ProvType src, ProvType dst) {
+		super(relation, src, dst);
 	}
 
 	public String getTrigger() {

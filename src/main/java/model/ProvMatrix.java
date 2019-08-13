@@ -3,118 +3,25 @@ package model;
 import java.util.List;
 
 import org.la4j.matrix.sparse.CRSMatrix;
-import org.openprovenance.prov.model.StatementOrBundle.Kind;
 
-public interface ProvMatrix {
+public interface ProvMatrix extends ProvRelation {
 
-	public static final String PROV_ENTITY = "ENTITY";
-	public static final String PROV_ABBREVIATE_ENTITY = "E";
-	public static final String PROV_AGENT = "AGENT";
-	public static final String PROV_ABBREVIATE_AGENT = "Ag";
-	public static final String PROV_ACTIVITY = "ACTIVITY";
-	public static final String PROV_ABBREVIATE_ACTIVITY = "Ac";
+	CRSMatrix getMatrix();
 
-	public static final String PROV_USAGE = "used";
-	public static final String PROV_ABBREVIATE_USAGE = "U S D";
+	Relation getRelation();
 
-	public static final String PROV_GENERATION = "wasGeneratedBy";
-	public static final String PROV_ABBREVIATE_GENERATION = "W G B";
+	String getRowDimentionName();
 
-	public static final String PROV_INVALIDATION = "wasInvalidatedBy";
-	public static final String PROV_ABBREVIATE_INVALIDATION = "W V B";
+	String getRowDimentionAbbreviate();
 
-	public static final String PROV_START = "wasStartedBy";
-	public static final String PROV_ABBREVIATE_START = "S T D";
+	String getColumnDimentionName();
 
-	public static final String PROV_END = "wasEndedBy";
-	public static final String PROV_ABBREVIATE_END = "E N D ";
+	String getColumnDimentionAbbreviate();
 
-	public static final String PROV_COMMUNICATION = "wasInformedBy";
-	public static final String PROV_ABBREVIATE_COMMUNICATION = "W F B";
+	List<String> getColumnDescriptors();
 
-	public static final String PROV_DERIVATION = "wasDerivedFrom";
-	public static final String PROV_ABBREVIATE_DERIVATION = "W D F";
-
-	public static final String PROV_ASSOCIATION = "wasAssociatedWith";
-	public static final String PROV_ABBREVIATE_ASSOCIATION = "W A W";
-
-	public static final String PROV_ATTRIBUTION = "wasAttributedTo";
-	public static final String PROV_ABBREVIATE_ATTRIBUTION = "W A T";
-
-	public static final String PROV_DELEGATION = "actedOnBehalfOf";
-	public static final String PROV_ABBREVIATE_DELEGATION = "A OB";
-
-	public static final String PROV_INFLUENCE = "wasInfluencedBy";
-	public static final String PROV_ABBREVIATE_INFLUENCE = "W I B";
-
-	public static final String PROV_ALTERNATE = "alternateOf";
-	public static final String PROV_ABBREVIATE_ALTERNATE = "A OF";
-
-	public static final String PROV_SPECIALIZATION = "specializationOf";
-	public static final String PROV_ABBREVIATE_SPECIALIZATION = "S OF";
-
-	public static final String PROV_MENTION = "mentionOf";
-	public static final String PROV_ABBREVIATE_MENTION = "M OF";
-
-	public static final String PROV_MEMBERSHIP = "hadMember";
-	public static final String PROV_ABBREVIATE_MEMBERSHIP = "H M B";
-
-	public CRSMatrix getMatrix();
-
-	public Relation getRelation();
-
-	public String getRowDimentionName();
-
-	public String getRowDimentionAbbreviate();
-
-	public String getColumnDimentionName();
-
-	public String getColumnDimentionAbbreviate();
-
-	public List<String> getColumnDescriptors();
-
-	public List<String> getRowDescriptors();
-
-	public enum Relation {
-
-		RELATION_USAGE(Kind.PROV_USAGE, PROV_USAGE, PROV_ABBREVIATE_USAGE),
-		RELATION_GENERATION(Kind.PROV_GENERATION, PROV_GENERATION, PROV_ABBREVIATE_GENERATION),
-		RELATION_INVALIDATION(Kind.PROV_INVALIDATION, PROV_INVALIDATION, PROV_ABBREVIATE_INVALIDATION),
-		RELATION_START(Kind.PROV_START, PROV_START, PROV_ABBREVIATE_START),
-		RELATION_END(Kind.PROV_END, PROV_END, PROV_ABBREVIATE_END),
-		RELATION_COMMUNICATION(Kind.PROV_COMMUNICATION, PROV_COMMUNICATION, PROV_ABBREVIATE_COMMUNICATION),
-		RELATION_DERIVATION(Kind.PROV_DERIVATION, PROV_DERIVATION, PROV_ABBREVIATE_DERIVATION),
-		RELATION_ASSOCIATION(Kind.PROV_ASSOCIATION, PROV_ASSOCIATION, PROV_ABBREVIATE_ASSOCIATION),
-		RELATION_ATTRIBUTION(Kind.PROV_ATTRIBUTION, PROV_ATTRIBUTION, PROV_ABBREVIATE_ATTRIBUTION),
-		RELATION_DELEGATION(Kind.PROV_DELEGATION, PROV_DELEGATION, PROV_ABBREVIATE_DELEGATION),
-		RELATION_INFLUENCE(Kind.PROV_INFLUENCE, PROV_INFLUENCE, PROV_ABBREVIATE_INFLUENCE),
-		RELATION_ALTERNATE(Kind.PROV_ALTERNATE, PROV_ALTERNATE, PROV_ABBREVIATE_ALTERNATE),
-		RELATION_SPECIALIZATION(Kind.PROV_SPECIALIZATION, PROV_SPECIALIZATION, PROV_ABBREVIATE_SPECIALIZATION),
-		RELATION_MENTION(Kind.PROV_MENTION, PROV_MENTION, PROV_ABBREVIATE_MENTION),
-		RELATION_MEMBERSHIP(Kind.PROV_MEMBERSHIP, PROV_MEMBERSHIP, PROV_ABBREVIATE_MEMBERSHIP);
-
-		private final Kind kind;
-		private final String description;
-		private final String abbreviate;
-
-		Relation(Kind kind, String desc, String abbr) {
-			this.kind = kind;
-			this.description = desc;
-			this.abbreviate = abbr;
-		}
-
-		public Kind getKind() {
-			return kind;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getAbbreviate() {
-			return abbreviate;
-		}
-
-	}
+	List<String> getRowDescriptors();
+	
+	boolean isEmpty();
 
 }

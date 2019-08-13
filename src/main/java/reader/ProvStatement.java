@@ -1,31 +1,31 @@
 package reader;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-public class ProvStatement {
+import model.ProvConcept;
+import model.ProvType;
+import model.ProvRelation.Relation;
+
+public class ProvStatement extends ProvConcept {
 
 	private String id;
-	private String name;
-	private ProvElement source;
-	private ProvElement destination;
-	private Map<String, String> attributes;
+	private Relation relation;
+	private ProvType source;
+	private ProvType destination;
 
-	public ProvStatement(String name, ProvElement src, ProvElement dst) {
+	public ProvStatement(Relation relation, ProvType src, ProvType dst) {
 		this();
-		this.name = name;
+		this.relation = relation;
 		this.source = src;
 		this.destination = dst;
 	}
 
 	public ProvStatement() {
 		super();
-		this.attributes = new HashMap<>();
 	}
 
-	public ProvStatement(String name, ProvElement src, ProvElement dst, String[] attributes) {
-		this(name, src, dst);
+	public ProvStatement(Relation relation, ProvType src, ProvType dst, String[] attributes) {
+		this(relation, src, dst);
 		if (attributes != null) {
 			for (int i = 0; i < attributes.length; i++) {
 				String[] keyValue = attributes[i].split("=");
@@ -34,41 +34,33 @@ public class ProvStatement {
 				if (attributes[i].split("=").length > 1) {
 					value = keyValue[1];
 				}
-				this.attributes.put(key, value);
+				super.getAttributes().put(key, value);
 			}
 		}
 	}
 
-	public ProvElement getSource() {
+	public ProvType getSource() {
 		return source;
 	}
 
-	public void setSource(ProvElement source) {
+	public void setSource(ProvType source) {
 		this.source = source;
 	}
 
-	public ProvElement getDestination() {
+	public ProvType getDestination() {
 		return destination;
 	}
 
-	public void setDestination(ProvElement destination) {
+	public void setDestination(ProvType destination) {
 		this.destination = destination;
 	}
 
-	public Map<String, String> getAttributes() {
-		return attributes;
+	public Relation getRelation() {
+		return relation;
 	}
 
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setRelation(Relation relation) {
+		this.relation = relation;
 	}
 
 	public String getId() {
@@ -85,16 +77,16 @@ public class ProvStatement {
 		String src = this.getSource() != null ? this.getSource().getName() : "-";
 		String dst = this.getDestination() != null ? this.getDestination().getName() : "-";
 		if (this.id != null) {
-			toString += this.name + "(" + this.id + "; " + src + ", " + dst;
+			toString += this.relation + "(" + this.id + "; " + src + ", " + dst;
 		} else {
-			toString += this.name + "(" + src + ", " + dst;
+			toString += this.relation + "(" + src + ", " + dst;
 		}
-		if (!this.attributes.isEmpty()) {
+		if (!super.getAttributes().isEmpty()) {
 			toString += ", [";
-			Set<String> keys = this.attributes.keySet();
+			Set<String> keys = super.getAttributes().keySet();
 			for (String key : keys) {
 				if (key != null) {
-					toString += key + "=" + this.attributes.get(key) + ",";
+					toString += key + "=" + super.getAttributes().get(key) + ",";
 				}
 			}
 			toString = toString.substring(0, toString.length() - 1);

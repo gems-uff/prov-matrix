@@ -1,21 +1,13 @@
 package convertion;
-/*
-import java.io.File;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import br.uff.ic.utility.IO.PROVNReader;
-import br.uff.ic.utility.graph.ActivityVertex;
-import br.uff.ic.utility.graph.AgentVertex;
-import br.uff.ic.utility.graph.Edge;
-import br.uff.ic.utility.graph.EntityVertex;
-import br.uff.ic.utility.graph.Vertex;
 import model.ActivityActivity;
 import model.ActivityAgent;
 import model.ActivityEntity;
@@ -24,11 +16,14 @@ import model.EntityActivity;
 import model.EntityAgent;
 import model.EntityEntity;
 import model.ProvMatrix;
-import model.ProvMatrix.Relation;*/
+import model.ProvRelation.Relation;
+import model.ProvType;
+import reader.ProvReader;
+import reader.ProvStatement;
 
-public class ProvMatrixGameFactory {
-/*
-	private PROVNReader pReader;
+public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
+
+	private ProvReader[] pReader;
 	private ActivityActivity wasInformedBy;
 	private ActivityActivity wasStartedBy;
 	private ActivityActivity wasEndedBy;
@@ -61,37 +56,23 @@ public class ProvMatrixGameFactory {
 	private Set<String> entities;
 	private Set<String> activities;
 
-	public ProvMatrixGameFactory() {
-		super();
-	}
-
-	public ProvMatrixGameFactory(String fileName) throws URISyntaxException, IOException {
-		this.pReader = new PROVNReader(new File(fileName));
-		this.pReader.readFile();
+	public ProvMatrixExtendedFactory() {
 		this.agents = new HashSet<>();
 		this.entities = new HashSet<>();
 		this.activities = new HashSet<>();
-		this.wasInformedBy = new ActivityActivity();
-		this.wasStartedBy = new ActivityActivity();
-		this.wasEndedBy = new ActivityActivity();
-		this.wasInfluencedByAcAc = new ActivityActivity();
-		this.wasAssociatedWith = new ActivityAgent();
-		this.wasAttributedTo = new EntityAgent();
-		this.wasInfluencedByEAg = new EntityAgent();
-		this.wasInfluencedByAcAg = new ActivityAgent();
-		this.used = new ActivityEntity();
-		this.wasInfluencedByAcE = new ActivityEntity();
-		this.wasInvalidatedBy = new EntityActivity();
-		this.wasGeneratedBy = new EntityActivity();
-		this.wasInfluencedByEAc = new EntityActivity();
-		this.wasDerivedFrom = new EntityEntity();
-		this.specializationOf = new EntityEntity();
-		this.alternateOf = new EntityEntity();
-		this.mentionOf = new EntityEntity();
-		this.hadMember = new EntityEntity();
-		this.wasInfluencedByEE = new EntityEntity();
-		this.actedOnBehalfOf = new AgentAgent();
-		this.wasInfluencedByAgAg = new AgentAgent();
+	}
+
+	public ProvMatrixExtendedFactory(String[] fileName, String dir) throws URISyntaxException, IOException {
+		this();
+		this.pReader = new ProvReader[fileName.length];
+		for (int i = 0; i < fileName.length; i++) {
+			String path = fileName[i];
+			if (path != null && !path.contains(":\\")) {
+				path = dir + path;
+			}
+			this.pReader[i] = new ProvReader(path);
+			this.pReader[i].readFile();
+		}
 	}
 
 	public ActivityActivity getWasInfluencedByAA() {
@@ -112,225 +93,340 @@ public class ProvMatrixGameFactory {
 
 	public List<ProvMatrix> buildMatrices() {
 		List<ProvMatrix> matrices = new ArrayList<>();
-		Collection<Vertex> vertices = this.pReader.getNodes();
-		for (Vertex v : vertices) {
-			if (v != null) {
-				if (v instanceof AgentVertex) {
-					if (!id(v).equals("")) {
-						agents.add(id(v));
-					}
-				} else if (v instanceof ActivityVertex) {
-					if (!id(v).equals("")) {
-						activities.add(id(v));
-					}
-				} else if (v instanceof EntityVertex) {
-					if (!id(v).equals("")) {
-						this.entities.add(id(v));
+		for (int i = 0; i < pReader.length; i++) {
+			List<String> agentsList = new ArrayList<>();
+			for (ProvType provType : pReader[i].getAgents()) {
+				agentsList.add(provType.getName());
+			}
+			List<String> activitiesList = new ArrayList<>();
+			for (ProvType provType : pReader[i].getActivities()) {
+				activitiesList.add(provType.getName());
+			}
+			List<String> entitiesList = new ArrayList<>();
+			for (ProvType provType : pReader[i].getEntities()) {
+				entitiesList.add(provType.getName());
+			}
+			if (this.wasInformedBy == null) {
+				this.wasInformedBy = new ActivityActivity(activitiesList);
+				this.getWasInformedBy().setRelation(Relation.RELATION_COMMUNICATION);
+			} else {
+				this.getWasInformedBy().setRelation(Relation.RELATION_COMMUNICATION);
+				this.wasInformedBy.add(activitiesList);
+			}
+			if (this.wasStartedBy == null) {
+				this.wasStartedBy = new ActivityActivity(activitiesList);
+				this.wasStartedBy.setRelation(Relation.RELATION_START);
+			} else {
+				this.wasStartedBy.setRelation(Relation.RELATION_START);
+				this.wasStartedBy.add(activitiesList);
+			}
+			if (this.wasEndedBy == null) {
+				this.wasEndedBy = new ActivityActivity(activitiesList);
+				this.wasEndedBy.setRelation(Relation.RELATION_END);
+			} else {
+				this.wasEndedBy.add(activitiesList);
+				this.wasEndedBy.setRelation(Relation.RELATION_END);
+			}
+			if (this.wasInfluencedByAcAc == null) {
+				this.wasInfluencedByAcAc = new ActivityActivity(activitiesList);
+				this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByAcAc.add(activitiesList);
+				this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+			}
+
+			if (this.wasAssociatedWith == null) {
+				this.wasAssociatedWith = new ActivityAgent(activitiesList, agentsList);
+				this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
+			} else {
+				this.wasAssociatedWith.add(activitiesList, agentsList);
+				this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
+			}
+			if (this.wasInfluencedByAcAg == null) {
+				this.wasInfluencedByAcAg = new ActivityAgent(activitiesList, agentsList);
+				this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByAcAg.add(activitiesList, agentsList);
+				this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+			}
+
+			if (this.used == null) {
+				this.used = new ActivityEntity(activitiesList, entitiesList);
+				this.used.setRelation(Relation.RELATION_USAGE);
+			} else {
+				this.used.add(activitiesList, entitiesList);
+				this.used.setRelation(Relation.RELATION_USAGE);
+			}
+
+			if (this.wasInfluencedByAcE == null) {
+				this.wasInfluencedByAcE = new ActivityEntity(activitiesList, entitiesList);
+				this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByAcE.add(activitiesList, entitiesList);
+				this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+			}
+
+			if (this.wasGeneratedBy == null) {
+				this.wasGeneratedBy = new EntityActivity(entitiesList, activitiesList);
+				this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
+			} else {
+				this.wasGeneratedBy.add(entitiesList, activitiesList);
+				this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
+			}
+			if (this.wasInfluencedByEAc == null) {
+				this.wasInfluencedByEAc = new EntityActivity(entitiesList, activitiesList);
+				this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+				this.wasInfluencedByEAc.add(entitiesList, activitiesList);
+			}
+			if (this.wasInvalidatedBy == null) {
+				this.wasInvalidatedBy = new EntityActivity(entitiesList, activitiesList);
+				this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
+			} else {
+				this.wasInvalidatedBy.add(entitiesList, activitiesList);
+				this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
+			}
+
+			if (this.wasAttributedTo == null) {
+				this.wasAttributedTo = new EntityAgent(entitiesList, agentsList);
+				this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
+			} else {
+				this.wasAttributedTo.add(entitiesList, agentsList);
+				this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
+			}
+			if (this.wasInfluencedByEAg == null) {
+				this.wasInfluencedByEAg = new EntityAgent(entitiesList, agentsList);
+				this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByEAg.add(entitiesList, agentsList);
+				this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
+			}
+
+			if (this.wasDerivedFrom == null) {
+				this.wasDerivedFrom = new EntityEntity(entitiesList);
+				this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
+			} else {
+				this.wasDerivedFrom.add(entitiesList);
+				this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
+			}
+			if (this.wasInfluencedByEE == null) {
+				this.wasInfluencedByEE = new EntityEntity(entitiesList);
+				this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByEE.add(entitiesList);
+				this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+			}
+			if (this.specializationOf == null) {
+				this.specializationOf = new EntityEntity(entitiesList);
+				this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
+			} else {
+				this.specializationOf.add(entitiesList);
+				this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
+			}
+			if (this.alternateOf == null) {
+				this.alternateOf = new EntityEntity(entitiesList);
+				this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
+			} else {
+				this.alternateOf.add(entitiesList);
+				this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
+			}
+			if (this.mentionOf == null) {
+				this.mentionOf = new EntityEntity(entitiesList);
+			} else {
+				this.mentionOf.add(entitiesList);
+			}
+			if (this.hadMember == null) {
+				this.hadMember = new EntityEntity(entitiesList);
+			} else {
+				this.hadMember.add(entitiesList);
+			}
+
+			if (this.actedOnBehalfOf == null) {
+				this.actedOnBehalfOf = new AgentAgent(agentsList);
+				this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
+			} else {
+				this.actedOnBehalfOf.add(agentsList);
+				this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
+			}
+			if (this.wasInfluencedByAgAg == null) {
+				this.wasInfluencedByAgAg = new AgentAgent(agentsList);
+				this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+			} else {
+				this.wasInfluencedByAgAg.add(agentsList);
+				this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+			}
+
+			Collection<ProvStatement> edges = this.pReader[i].getStatements();
+			for (ProvStatement e : edges) {
+				if (e != null) {
+					ProvType src = e.getSource();
+					ProvType dst = e.getDestination();
+					if (src != null && dst != null) {
+						switch (e.getRelation()) {
+						case RELATION_COMMUNICATION: {
+							this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
+							this.wasInformedBy.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_START: {
+							if (src != null && dst != null) {
+								this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+								this.wasStartedBy.setRelation(Relation.RELATION_START);
+								this.wasStartedBy.add(src.getName(), dst.getName());
+							}
+							break;
+						}
+						case RELATION_END: {
+							this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							this.wasEndedBy.setRelation(Relation.RELATION_END);
+							this.wasEndedBy.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_ASSOCIATION: {
+							this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByAcAg.add(src.getName(), dst.getName());
+							this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
+							if (activitiesList.contains(src.getName()) && agentsList.contains(dst.getName())) {
+								this.wasAssociatedWith.add(src.getName(), dst.getName());
+							} else {
+								System.out.println("Não encontrou act:" + src.getName() + ", ag: " + dst.getName());
+								throw new RuntimeException(
+										"Não encontrou act:" + src.getName() + ", ag: " + dst.getName());
+							}
+							break;
+						}
+						case RELATION_ATTRIBUTION: {
+							this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEAg.add(src.getName(), dst.getName());
+							this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
+							this.wasAttributedTo.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_USAGE: {
+							this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByAcE.add(src.getName(), dst.getName());
+							this.used.setRelation(Relation.RELATION_USAGE);
+							this.used.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_INVALIDATION: {
+							this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
+							this.wasInvalidatedBy.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_GENERATION: {
+							this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
+							this.wasGeneratedBy.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_DERIVATION: {
+							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
+							this.wasDerivedFrom.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_SPECIALIZATION: {
+							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
+							this.specializationOf.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_ALTERNATE: {
+							this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
+							this.alternateOf.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_MENTION: {
+							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByEE.add(dst.getName(), src.getName());
+							this.mentionOf.setRelation(Relation.RELATION_MENTION);
+							this.mentionOf.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_MEMBERSHIP: {
+							this.hadMember.setRelation(Relation.RELATION_MEMBERSHIP);
+							this.hadMember.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_DELEGATION: {
+							this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+							this.wasInfluencedByAgAg.add(src.getName(), dst.getName());
+							this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
+							this.actedOnBehalfOf.add(src.getName(), dst.getName());
+							break;
+						}
+						case RELATION_INFLUENCE: {
+							if (entities.contains(src.getName()) && entities.contains(dst.getName())) {
+								this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							} else if (agents.contains(src.getName()) && agents.contains(dst.getName())) {
+								this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAgAg.add(src.getName(), dst.getName());
+							} else if (activities.contains(src.getName()) && activities.contains(dst.getName())) {
+								this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							} else if (activities.contains(src.getName()) && entities.contains(dst.getName())) {
+								this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcE.add(src.getName(), dst.getName());
+							} else if (activities.contains(src.getName()) && agents.contains(dst.getName())) {
+								this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAg.add(src.getName(), dst.getName());
+							} else if (entities.contains(src.getName()) && activities.contains(dst.getName())) {
+								this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							} else if (entities.contains(src.getName()) && agents.contains(dst.getName())) {
+								this.wasAttributedTo.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEAg.add(src.getName(), dst.getName());
+							}
+							break;
+						}
+						default:
+							break;
+						}
 					}
 				}
 			}
 		}
-		List<String> agentsList = new ArrayList<>(agents);
-		Collections.sort(agentsList);
-		List<String> activitiesList = new ArrayList<>(activities);
-		Collections.sort(activitiesList);
-		List<String> entitiesList = new ArrayList<>(entities);
-		Collections.sort(entitiesList);
-		this.wasInformedBy = new ActivityActivity(activitiesList);
-		this.wasStartedBy = new ActivityActivity(activitiesList);
-		this.wasEndedBy = new ActivityActivity(activitiesList);
-		this.wasInfluencedByAcAc = new ActivityActivity(activitiesList);
-
-		this.wasAssociatedWith = new ActivityAgent(activitiesList, agentsList);
-		this.wasInfluencedByAcAg = new ActivityAgent(activitiesList, agentsList);
-
-		this.used = new ActivityEntity(activitiesList, entitiesList);
-		this.wasInfluencedByAcE = new ActivityEntity(activitiesList, entitiesList);
-
-		this.wasInvalidatedBy = new EntityActivity(entitiesList, activitiesList);
-		this.wasGeneratedBy = new EntityActivity(entitiesList, activitiesList);
-		this.wasInfluencedByEAc = new EntityActivity(entitiesList, activitiesList);
-
-		this.wasAttributedTo = new EntityAgent(entitiesList, agentsList);
-		this.wasInfluencedByEAg = new EntityAgent(entitiesList, agentsList);
-
-		this.wasDerivedFrom = new EntityEntity(entitiesList);
-		this.specializationOf = new EntityEntity(entitiesList);
-		this.alternateOf = new EntityEntity(entitiesList);
-		this.mentionOf = new EntityEntity(entitiesList);
-		this.hadMember = new EntityEntity(entitiesList);
-		this.wasInfluencedByEE = new EntityEntity(entitiesList);
-
-		this.actedOnBehalfOf = new AgentAgent(agentsList);
-		this.wasInfluencedByAgAg = new AgentAgent(agentsList);
-
-		Collection<Edge> edges = this.pReader.getEdges();
-		for (Edge e : edges) {
-			if (e != null) {
-				Vertex src = (Vertex) e.getSource();
-				Vertex dst = (Vertex) e.getTarget();
-				switch (e.getType()) {
-				case ProvMatrix.PROV_COMMUNICATION: {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(src), id(dst));
-					this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
-					this.wasInformedBy.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_START: {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(src), id(dst));
-					this.wasStartedBy.setRelation(Relation.RELATION_START);
-					this.wasStartedBy.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_END: {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(src), id(dst));
-					this.wasEndedBy.setRelation(Relation.RELATION_END);
-					this.wasEndedBy.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_ASSOCIATION: {
-					this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAg.add(id(src), id(dst));
-					this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
-					if (this.activities.contains(id(src)) && this.agents.contains(id(dst))) {
-						this.wasAssociatedWith.add(id(src), id(dst));
-					} else {
-						System.out.println("Não encontrou act:"+id(src)+", ag: "+id(dst));
-						throw new RuntimeException("Não encontrou act:"+id(src)+", ag: "+id(dst));
-					}
-					break;
-				}
-				case ProvMatrix.PROV_ATTRIBUTION: {
-					this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAg.add(id(src), id(dst));
-					this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
-					this.wasAttributedTo.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_USAGE: {
-					this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcE.add(id(src), id(dst));
-					this.used.setRelation(Relation.RELATION_USAGE);
-					this.used.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_INVALIDATION: {
-					this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAc.add(id(src), e.getLabel());
-					this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
-					this.wasInvalidatedBy.add(id(src), e.getLabel());
-					break;
-				}
-				case ProvMatrix.PROV_GENERATION: {
-					this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAc.add(id(src), e.getLabel());
-					this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
-					this.wasGeneratedBy.add(id(src), e.getLabel());
-					break;
-				}
-				case ProvMatrix.PROV_DERIVATION: {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(src), id(dst));
-					this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
-					this.wasDerivedFrom.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_SPECIALIZATION: {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(src), id(dst));
-					this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
-					this.specializationOf.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_ALTERNATE: {
-					this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
-					this.alternateOf.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_MENTION: {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(dst), id(src));
-					this.mentionOf.setRelation(Relation.RELATION_MENTION);
-					this.mentionOf.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_MEMBERSHIP: {
-					this.hadMember.setRelation(Relation.RELATION_MEMBERSHIP);
-					this.hadMember.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_DELEGATION: {
-					this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAgAg.add(id(src), id(dst));
-					this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
-					this.actedOnBehalfOf.add(id(src), id(dst));
-					break;
-				}
-				case ProvMatrix.PROV_INFLUENCE: {
-					if (entities.contains(id(src)) && entities.contains(id(dst))) {
-						this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByEE.add(id(src), id(dst));
-					} else if (agents.contains(id(src)) && agents.contains(id(dst))) {
-						this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByAgAg.add(id(src), id(dst));
-					} else if (activities.contains(id(src)) && activities.contains(id(dst))) {
-						this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByAcAc.add(id(src), id(dst));
-					} else if (activities.contains(id(src)) && entities.contains(id(dst))) {
-						this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByAcE.add(id(src), id(dst));
-					} else if (activities.contains(id(src)) && agents.contains(id(dst))) {
-						this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByAcAg.add(id(src), id(dst));
-					} else if (entities.contains(id(src)) && activities.contains(id(dst))) {
-						this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByEAc.add(id(src), id(dst));
-					} else if (entities.contains(id(src)) && agents.contains(id(dst))) {
-						this.wasAttributedTo.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByEAg.add(id(src), id(dst));
-					}
-					break;
-				}
-				default:
-					break;
-				}
-			}
-		}
-		matrices.add(this.wasInformedBy);
-		matrices.add(this.wasStartedBy);
-		matrices.add(this.wasEndedBy);
-		matrices.add(this.wasInfluencedByAcAc);
-		matrices.add(this.wasAssociatedWith);
-		matrices.add(this.wasInfluencedByAcAg);
-		matrices.add(this.wasAttributedTo);
-		matrices.add(this.wasInfluencedByEAg);
-		matrices.add(this.used);
-		matrices.add(this.wasInfluencedByAcE);
-		matrices.add(this.wasInvalidatedBy);
-		matrices.add(this.wasGeneratedBy);
-		matrices.add(this.wasInfluencedByEAc);
-		matrices.add(this.wasDerivedFrom);
-		matrices.add(this.specializationOf);
-		matrices.add(this.alternateOf);
-		matrices.add(this.mentionOf);
-		matrices.add(this.hadMember);
-		matrices.add(this.wasInfluencedByEE);
-		matrices.add(this.actedOnBehalfOf);
-		matrices.add(this.wasInfluencedByAgAg);
+		add(matrices, this.wasInformedBy);
+		add(matrices, this.wasStartedBy);
+		add(matrices, this.wasEndedBy);
+		add(matrices, this.wasInfluencedByAcAc);
+		add(matrices, this.wasAssociatedWith);
+		add(matrices, this.wasInfluencedByAcAg);
+		add(matrices, this.wasAttributedTo);
+		add(matrices, this.wasInfluencedByEAg);
+		add(matrices, this.used);
+		add(matrices, this.wasInfluencedByAcE);
+		add(matrices, this.wasInvalidatedBy);
+		add(matrices, this.wasGeneratedBy);
+		add(matrices, this.wasInfluencedByEAc);
+		add(matrices, this.wasDerivedFrom);
+		add(matrices, this.specializationOf);
+		add(matrices, this.alternateOf);
+		add(matrices, this.mentionOf);
+		add(matrices, this.hadMember);
+		add(matrices, this.wasInfluencedByEE);
+		add(matrices, this.actedOnBehalfOf);
+		add(matrices, this.wasInfluencedByAgAg);
 		return matrices;
+
 	}
 
-	public String id(Vertex vertex) {
-		String id = "";
-		if (vertex instanceof ActivityVertex) {
-			id = vertex.getAttributeValue("Label").replace(" ", "");
-		} else {
-			id = vertex.getID(); 
+	private void add(List<ProvMatrix> matrices, ProvMatrix provMatrix) {
+		if (!provMatrix.isEmpty()) {
+			matrices.add(provMatrix);
 		}
-		return id.contains("Unknown") ? "" : id;
 	}
 
 	public void setWasInfluencedBy(EntityEntity wasInfluencedBy) {
@@ -516,5 +612,5 @@ public class ProvMatrixGameFactory {
 	public void setWasInvalidatedBy(EntityActivity wasInvalidatedBy) {
 		this.wasInvalidatedBy = wasInvalidatedBy;
 	}
-*/
+
 }

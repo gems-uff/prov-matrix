@@ -1,5 +1,8 @@
 package reader;
 
+import model.ProvType;
+import model.ProvRelation.Relation;
+
 public class ProvTimedStatement extends ProvStatement{
 	
 	private String time;
@@ -8,12 +11,12 @@ public class ProvTimedStatement extends ProvStatement{
 		super();
 	}
 
-	public ProvTimedStatement(String name, ProvElement src, ProvElement dst, String[] attributes) {
-		super(name, src, dst, attributes);
+	public ProvTimedStatement(Relation relation, ProvType src, ProvType dst, String[] attributes) {
+		super(relation, src, dst, attributes);
 	}
 
-	public ProvTimedStatement(String name, ProvElement src, ProvElement dst) {
-		super(name, src, dst);
+	public ProvTimedStatement(Relation relation, ProvType src, ProvType dst) {
+		super(relation, src, dst);
 	}
 
 

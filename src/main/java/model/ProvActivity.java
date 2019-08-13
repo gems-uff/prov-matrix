@@ -1,14 +1,14 @@
-package reader;
+package model;
 
 import java.util.Set;
 
-public class ProvActivity extends ProvElement {
+public class ProvActivity extends ProvType {
 
 	private String startTime;
 	private String endTime;
 
 	public ProvActivity(String id, String[] optionalAttributes) {
-		super(id, optionalAttributes);
+		super(id, ProvType.PROV_ACTIVITY, optionalAttributes);
 	}
 
 	public String getStartTime() {
@@ -29,7 +29,7 @@ public class ProvActivity extends ProvElement {
 
 	@Override
 	public String toString() {
-		String toString = "";
+		String toString = "activity(";
 		toString += super.getName();
 		if (!super.getAttributes().isEmpty()) {
 			if (this.startTime != null) {
