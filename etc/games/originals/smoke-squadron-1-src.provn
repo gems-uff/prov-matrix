@@ -1,5 +1,5 @@
 document
-activity(vertex_5,-,-,[ObjectTag=Player01, Health=200, ObjectID=67340, Label=Flying, ObjectPosition_Z=140.4134, Timestamp=7.2979, ObjectPosition_Y=1640.081, ObjectPosition_X=-1368.853, ObjectName=AircraftJet01])
+activity(vertex_5,-,-,[ObjectTag=Player01, Health=200, ObjectID=67340,Label=Flying, ObjectPosition_Z=140.4134, Timestamp=7.2979,ObjectPosition_Y=1640.081,  ObjectPosition_X=-1368.853,ObjectName=AircraftJet01])
 activity(vertex_6,-,-,[ObjectTag=Player02, Health=200, ObjectID=67320, Label=Taking Damage, ObjectPosition_Z=1225.905, Timestamp=8.851, ObjectPosition_Y=1709.721, ObjectPosition_X=1943.263, ObjectName=AircraftJet02])
 entity(vertex_3,[Speed=600, ObjectID=-339528, Label=Missile, DirectionY=-0.1287003, DirectionZ=0.5603256, DirectionX=0.8182124, Timestamp=6.791398, ObjectName=SimpleMissileClone, ObjectTag=Rocket, ObjectPosition_Z=109.2032, ObjectPosition_Y=1637.281, ObjectPosition_X=-1414.427])
 activity(vertex_4,-,-,[ObjectTag=Player02, Health=200, ObjectID=67320, Label=Flying, ObjectPosition_Z=1387.75, Timestamp=7.2979, ObjectPosition_Y=1709.721, ObjectPosition_X=2136.142, ObjectName=AircraftJet02])

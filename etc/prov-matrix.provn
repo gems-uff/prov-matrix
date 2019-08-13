@@ -1,7 +1,6 @@
 document
 prefix result <http://localhost/#>
 prefix fullResult <&serialization=PROV-N#>
-bundle result:provenance
 entity(result:file-etc-project-management-provn, [prov:label="etc/project-management.provn"])
 entity(result:file-etc-project-management-svg, [prov:label="etc/project-management.svg"])
 entity(result:file-etc-project-management2-svg, [prov:label="etc/project-management2.svg"])
@@ -640,5 +639,4 @@ wasInvalidatedBy(result:file-src-main-java-PrintMatrix-java_commit-7f719bde203bb
 wasInvalidatedBy(result:file-etc-a-little-provn_commit-f176da378502fdb5952eb29d26a272b6a22ea2aa, result:commit-f176da378502fdb5952eb29d26a272b6a22ea2aa, 2019-04-10T20:30:46.000Z)
 wasInvalidatedBy(result:file-src-main-java-ProvnToSVG-java_commit-7f719bde203bb6fbedac1a6ae9a9b738235ccbb5, result:commit-7f719bde203bb6fbedac1a6ae9a9b738235ccbb5, 2019-04-30T02:02:48.000Z)
 wasInvalidatedBy(result:file-src-main-java-CookSample-java_commit-7f719bde203bb6fbedac1a6ae9a9b738235ccbb5, result:commit-7f719bde203bb6fbedac1a6ae9a9b738235ccbb5, 2019-04-30T02:02:48.000Z)
-endBundle 
 endDocument
