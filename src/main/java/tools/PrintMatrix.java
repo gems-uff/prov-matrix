@@ -1,5 +1,4 @@
 package tools;
-import org.apache.commons.collections.functors.InvokerTransformer;
 import org.la4j.LinearAlgebra.InverterFactory;
 import org.la4j.matrix.Matrix;
 import org.la4j.matrix.dense.Basic2DMatrix;

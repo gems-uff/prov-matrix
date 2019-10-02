@@ -136,7 +136,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		}
 	}
 
-	public List<ProvMatrix> buildMatrices() {
+	public List<ProvMatrix> buildMatrices(boolean deriveInfluence) {
 		List<ProvMatrix> matrices = new ArrayList<>();
 		for (int i = 0; i < documents.length; i++) {
 			List<StatementOrBundle> sbs;
@@ -150,7 +150,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 				StatementOrBundle sb = iterator.next();
 				if (sb != null) {
 					if (sb instanceof Statement) {
-						processStatement(sb);
+						processStatement(sb, deriveInfluence);
 					} else {
 						Bundle bundle = (Bundle) sb;
 						buildBundleIndex(bundle.getStatement());
@@ -354,14 +354,16 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		}
 	}
 
-	private void processStatement(StatementOrBundle sb) {
+	private void processStatement(StatementOrBundle sb, boolean deriveInfluence) {
 		if (sb != null) {
 			switch (sb.getKind()) {
 			case PROV_COMMUNICATION: {
 				WasInformedBy wi = (WasInformedBy) sb;
 				if (wi.getInformant() != null && wi.getInformed() != null) {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(wi.getInformant()), id(wi.getInformed()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAcAc.add(id(wi.getInformant()), id(wi.getInformed()));
+					}
 					this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
 					this.wasInformedBy.add(id(wi.getInformant()), id(wi.getInformed()));
 				}
@@ -370,8 +372,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_START: {
 				WasStartedBy ws = (WasStartedBy) sb;
 				if (ws.getStarter() != null && ws.getTrigger() != null) {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(ws.getStarter()), id(ws.getTrigger()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAcAc.add(id(ws.getStarter()), id(ws.getTrigger()));
+					}
 					this.wasStartedBy.setRelation(Relation.RELATION_START);
 					this.wasStartedBy.add(id(ws.getStarter()), id(ws.getTrigger()));
 				}
@@ -380,8 +384,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_END: {
 				WasEndedBy we = (WasEndedBy) sb;
 				if (we.getEnder() != null && we.getTrigger() != null) {
-					this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAc.add(id(we.getEnder()), id(we.getTrigger()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAcAc.add(id(we.getEnder()), id(we.getTrigger()));
+					}
 					this.wasEndedBy.setRelation(Relation.RELATION_START);
 					this.wasEndedBy.add(id(we.getEnder()), id(we.getTrigger()));
 				}
@@ -390,8 +396,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_ASSOCIATION: {
 				WasAssociatedWith waw = (WasAssociatedWith) sb;
 				if (waw.getActivity() != null && waw.getAgent() != null) {
-					this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcAg.add(id(waw.getActivity()), id(waw.getAgent()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAcAg.add(id(waw.getActivity()), id(waw.getAgent()));
+					}
 					this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
 					if (this.activities.contains(id(waw.getActivity())) && this.agents.contains(id(waw.getAgent()))) {
 						this.wasAssociatedWith.add(id(waw.getActivity()), id(waw.getAgent()));
@@ -407,8 +415,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_ATTRIBUTION: {
 				WasAttributedTo wat = (WasAttributedTo) sb;
 				if (wat.getEntity() != null && wat.getAgent() != null) {
-					this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAg.add(id(wat.getEntity()), id(wat.getAgent()));
+					if (deriveInfluence) {
+						this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEAg.add(id(wat.getEntity()), id(wat.getAgent()));
+					}
 					this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
 					this.wasAttributedTo.add(id(wat.getEntity()), id(wat.getAgent()));
 				}
@@ -417,8 +427,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_USAGE: {
 				Used usd = (Used) sb;
 				if (usd.getActivity() != null && usd.getEntity() != null) {
-					this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAcE.add(id(usd.getActivity()), id(usd.getEntity()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAcE.add(id(usd.getActivity()), id(usd.getEntity()));
+					}
 					this.used.setRelation(Relation.RELATION_USAGE);
 					this.used.add(id(usd.getActivity()), id(usd.getEntity()));
 				}
@@ -427,8 +439,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_INVALIDATION: {
 				WasInvalidatedBy wvb = (WasInvalidatedBy) sb;
 				if (wvb.getEntity() != null && wvb.getActivity() != null) {
-					this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAc.add(id(wvb.getEntity()), id(wvb.getActivity()));
+					if (deriveInfluence) {
+						this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEAc.add(id(wvb.getEntity()), id(wvb.getActivity()));
+					}
 					this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
 					this.wasInvalidatedBy.add(id(wvb.getEntity()), id(wvb.getActivity()));
 				}
@@ -437,9 +451,11 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_GENERATION: {
 				WasGeneratedBy wgb = (WasGeneratedBy) sb;
 				if (wgb.getEntity() != null && wgb.getActivity() != null) {
-					this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEAc.add(id(wgb.getEntity()), id(wgb.getActivity()));
-					this.wasGeneratedBy.setRelation(Relation.RELATION_INVALIDATION);
+					if (deriveInfluence) {
+						this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEAc.add(id(wgb.getEntity()), id(wgb.getActivity()));
+					}
+					this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
 					this.wasGeneratedBy.add(id(wgb.getEntity()), id(wgb.getActivity()));
 				}
 				break;
@@ -447,8 +463,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_DERIVATION: {
 				WasDerivedFrom wdf = (WasDerivedFrom) sb;
 				if (wdf.getGeneratedEntity() != null && wdf.getUsedEntity() != null) {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(wdf.getGeneratedEntity()), id(wdf.getUsedEntity()));
+					if (deriveInfluence) {
+						this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEE.add(id(wdf.getGeneratedEntity()), id(wdf.getUsedEntity()));
+					}
 					this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
 					this.wasDerivedFrom.add(id(wdf.getGeneratedEntity()), id(wdf.getUsedEntity()));
 				}
@@ -457,8 +475,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_SPECIALIZATION: {
 				SpecializationOf so = (SpecializationOf) sb;
 				if (so.getSpecificEntity() != null && so.getGeneralEntity() != null) {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(so.getSpecificEntity()), id(so.getGeneralEntity()));
+					if (deriveInfluence) {
+						this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEE.add(id(so.getSpecificEntity()), id(so.getGeneralEntity()));
+					}
 					this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
 					this.specializationOf.add(id(so.getSpecificEntity()), id(so.getGeneralEntity()));
 				}
@@ -467,6 +487,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_ALTERNATE: {
 				AlternateOf ao = (AlternateOf) sb;
 				if (ao.getAlternate1() != null && ao.getAlternate2() != null) {
+					if (deriveInfluence) {
+						this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEE.add(id(ao.getAlternate1()), id(ao.getAlternate2()));
+					}
 					this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
 					this.alternateOf.add(id(ao.getAlternate1()), id(ao.getAlternate2()));
 				}
@@ -475,8 +499,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_MENTION: {
 				MentionOf mo = (MentionOf) sb;
 				if (mo.getSpecificEntity() != null && mo.getGeneralEntity() != null) {
-					this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByEE.add(id(mo.getSpecificEntity()), id(mo.getGeneralEntity()));
+					if (deriveInfluence) {
+						this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByEE.add(id(mo.getSpecificEntity()), id(mo.getGeneralEntity()));
+					}
 					this.mentionOf.setRelation(Relation.RELATION_MENTION);
 					this.mentionOf.add(id(mo.getSpecificEntity()), id(mo.getGeneralEntity()));
 				}
@@ -498,8 +524,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			case PROV_DELEGATION: {
 				ActedOnBehalfOf aob = (ActedOnBehalfOf) sb;
 				if (aob.getDelegate() != null && aob.getResponsible() != null) {
-					this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
-					this.wasInfluencedByAgAg.add(id(aob.getDelegate()), id(aob.getResponsible()));
+					if (deriveInfluence) {
+						this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+						this.wasInfluencedByAgAg.add(id(aob.getDelegate()), id(aob.getResponsible()));
+					}
 					this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
 					this.actedOnBehalfOf.add(id(aob.getDelegate()), id(aob.getResponsible()));
 				}

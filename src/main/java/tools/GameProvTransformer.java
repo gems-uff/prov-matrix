@@ -62,10 +62,10 @@ public class GameProvTransformer extends InputStreamReader {
 		elements = line.split("\\(");
 		if (elements.length > 1) {
 			statement = elements[1].split("\\[");
-			attributes = statement[0].split(",");
+			attributes = statement[0].split("\\s*,\\s*");
 
 			if (statement.length > 1) {
-				optionalAttributes = statement[1].split(",");
+				optionalAttributes = statement[1].split("\\s*,\\s*");
 			}
 			if (elements[0].contains("agent") && optionalAttributes != null) {
 				line = rewriteAgent(line, attributes, optionalAttributes);

@@ -91,7 +91,7 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 		this.wasInfluencedByEE = wasInfluencedByEE;
 	}
 
-	public List<ProvMatrix> buildMatrices() {
+	public List<ProvMatrix> buildMatrices(boolean deriveInfluence) {
 		List<ProvMatrix> matrices = new ArrayList<>();
 		for (int i = 0; i < pReader.length; i++) {
 			List<String> agentsList = new ArrayList<>();
@@ -265,31 +265,39 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 					if (src != null && dst != null) {
 						switch (e.getRelation()) {
 						case RELATION_COMMUNICATION: {
-							this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							}
 							this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
 							this.wasInformedBy.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_START: {
 							if (src != null && dst != null) {
-								this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-								this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+								if (deriveInfluence) {
+									this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+									this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+								}
 								this.wasStartedBy.setRelation(Relation.RELATION_START);
 								this.wasStartedBy.add(src.getName(), dst.getName());
 							}
 							break;
 						}
 						case RELATION_END: {
-							this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAc.add(src.getName(), dst.getName());
+							}
 							this.wasEndedBy.setRelation(Relation.RELATION_END);
 							this.wasEndedBy.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_ASSOCIATION: {
-							this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByAcAg.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcAg.add(src.getName(), dst.getName());
+							}
 							this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
 							if (activitiesList.contains(src.getName()) && agentsList.contains(dst.getName())) {
 								this.wasAssociatedWith.add(src.getName(), dst.getName());
@@ -301,55 +309,73 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 							break;
 						}
 						case RELATION_ATTRIBUTION: {
-							this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEAg.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEAg.add(src.getName(), dst.getName());
+							}
 							this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
 							this.wasAttributedTo.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_USAGE: {
-							this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByAcE.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAcE.add(src.getName(), dst.getName());
+							}
 							this.used.setRelation(Relation.RELATION_USAGE);
 							this.used.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_INVALIDATION: {
-							this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							}
 							this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
 							this.wasInvalidatedBy.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_GENERATION: {
-							this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEAc.add(src.getName(), dst.getName());
+							}
 							this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
 							this.wasGeneratedBy.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_DERIVATION: {
-							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							}
 							this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
 							this.wasDerivedFrom.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_SPECIALIZATION: {
-							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							}
 							this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
 							this.specializationOf.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_ALTERNATE: {
+							if (deriveInfluence) {
+								this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEE.add(src.getName(), dst.getName());
+							}
 							this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
 							this.alternateOf.add(src.getName(), dst.getName());
 							break;
 						}
 						case RELATION_MENTION: {
-							this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByEE.add(dst.getName(), src.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByEE.add(dst.getName(), src.getName());
+							}
 							this.mentionOf.setRelation(Relation.RELATION_MENTION);
 							this.mentionOf.add(src.getName(), dst.getName());
 							break;
@@ -360,8 +386,10 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 							break;
 						}
 						case RELATION_DELEGATION: {
-							this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
-							this.wasInfluencedByAgAg.add(src.getName(), dst.getName());
+							if (deriveInfluence) {
+								this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
+								this.wasInfluencedByAgAg.add(src.getName(), dst.getName());
+							}
 							this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
 							this.actedOnBehalfOf.add(src.getName(), dst.getName());
 							break;

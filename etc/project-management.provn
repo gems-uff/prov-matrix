@@ -29,7 +29,7 @@ document
 	agent(req-engineer1)
 	agent(req-engineer2)
 	activity(write,-,-)
-	activity(fix,-,-)
+	activity(fix,[time=10h],-)
 	activity(code,-,-)
 	activity(test,-,-)
 	hadMember(rf1,requirementList)
