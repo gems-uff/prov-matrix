@@ -1,9 +1,11 @@
 package convertion;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openprovenance.prov.interop.InteropFramework;
@@ -76,11 +78,13 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	private Set<String> agents;
 	private Set<String> entities;
 	private Set<String> activities;
+	private Map<String, String> labels;
 
 	public ProvMatrixDefaultFactory() {
 		this.agents = new HashSet<>();
 		this.entities = new HashSet<>();
 		this.activities = new HashSet<>();
+		this.labels = new HashMap<String, String>();
 	}
 
 	public ProvMatrixDefaultFactory(String[] filePaths, String dir) {
@@ -124,12 +128,24 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			if (sb instanceof Statement) {
 				if (sb != null && sb.getKind() == Kind.PROV_ENTITY) {
 					Entity et = (Entity) sb;
-					entities.add(id(et.getId()));
+					String id = id(et.getId());
+					if (et.getLabel() != null && !et.getLabel().isEmpty()) {
+						labels.put(id, et.getLabel().get(0).getValue());
+					}
+					entities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
 					Activity ac = (Activity) sb;
-					activities.add(id(ac.getId()));
+					String id = id(ac.getId());
+					if (ac.getLabel() != null && !ac.getLabel().isEmpty()) {
+						labels.put(id, ac.getLabel().get(0).getValue());
+					}
+					activities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
 					Agent ag = (Agent) sb;
+					String id = id(ag.getId());
+					if (ag.getLabel() != null && !ag.getLabel().isEmpty()) {
+						labels.put(id, ag.getLabel().get(0).getValue());
+					}
 					agents.add(id(ag.getId()));
 				}
 			}
@@ -770,6 +786,15 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 
 	public void setWasInfluencedByEE(EntityEntity wasInfluencedByEE) {
 		this.wasInfluencedByEE = wasInfluencedByEE;
+	}
+
+	@Override
+	public Map<String, String> getLabels() {
+		return this.labels;
+	}
+
+	public void setLabels(Map<String, String> labels) {
+		this.labels = labels;
 	}
 
 }

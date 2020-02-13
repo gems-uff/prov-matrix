@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import model.ActivityActivity;
@@ -55,11 +57,13 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 	private Set<String> agents;
 	private Set<String> entities;
 	private Set<String> activities;
+	private Map<String, String> labels;
 
 	public ProvMatrixExtendedFactory() {
 		this.agents = new HashSet<>();
 		this.entities = new HashSet<>();
 		this.activities = new HashSet<>();
+		this.labels = new HashMap<String, String>();
 	}
 
 	public ProvMatrixExtendedFactory(String[] fileName, String dir) throws URISyntaxException, IOException {
@@ -639,6 +643,14 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 
 	public void setWasInvalidatedBy(EntityActivity wasInvalidatedBy) {
 		this.wasInvalidatedBy = wasInvalidatedBy;
+	}
+
+	public Map<String, String> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(Map<String, String> labels) {
+		this.labels = labels;
 	}
 
 }
