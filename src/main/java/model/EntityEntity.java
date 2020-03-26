@@ -268,4 +268,9 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 	public boolean isEmpty() {
 		return this.matrix.density() == 0.0;
 	}
+
+	@Override
+	public String getIdentifier() {
+		return this.relation != null ? this.relation.getAbbreviate().replace(" ", "") : null;
+	}
 }

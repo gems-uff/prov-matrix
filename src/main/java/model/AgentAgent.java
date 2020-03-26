@@ -61,9 +61,9 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		this.destinationAgentsId = agentsList;
 		matrix = new CRSMatrix(agentsList.size(), agentsList.size());
 	}
-	
+
 	public void add(List<String> agentsList) {
-		
+
 		if (agentsList != null) {
 			for (String ag : agentsList) {
 				if (!this.originAgentsId.contains(ag)) {
@@ -73,7 +73,8 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 					this.destinationAgentsId.add(ag);
 				}
 			}
-			if (matrix.rows()!=this.getRowDescriptors().size() || matrix.columns()!=this.getColumnDescriptors().size()) {
+			if (matrix.rows() != this.getRowDescriptors().size()
+					|| matrix.columns() != this.getColumnDescriptors().size()) {
 				matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
 			}
 		}
@@ -206,10 +207,15 @@ public class AgentAgent extends BasicProv implements ProvMatrix {
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return this.matrix.density() == 0.0;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return this.relation != null ? this.relation.getAbbreviate().replace(" ", "") : null;
 	}
 
 }

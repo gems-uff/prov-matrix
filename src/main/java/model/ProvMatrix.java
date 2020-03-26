@@ -9,6 +9,8 @@ public interface ProvMatrix extends ProvRelation {
 	CRSMatrix getMatrix();
 
 	Relation getRelation();
+	
+	String getIdentifier();
 
 	String getRowDimentionName();
 
