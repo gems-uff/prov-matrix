@@ -128,22 +128,22 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 			switch (sb.getKind()) {
 			case PROV_COMMUNICATION: {
 				WasInformedBy wi = (WasInformedBy) sb;
-				int i = originActivitiesId.indexOf(id(wi.getInformed()));
-				int j = destinationActivitiesId.indexOf(id(wi.getInformant()));
+				int i = destinationActivitiesId.indexOf(id(wi.getInformant()));
+				int j = originActivitiesId.indexOf(id(wi.getInformed()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 				break;
 			}
 			case PROV_START: {
 				WasStartedBy ws = (WasStartedBy) sb;
-				int i = originActivitiesId.indexOf(id(ws.getActivity()));
-				int j = destinationActivitiesId.indexOf(id(ws.getTrigger()));
+				int i = destinationActivitiesId.indexOf(id(ws.getTrigger()));
+				int j = originActivitiesId.indexOf(id(ws.getActivity()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 				break;
 			}
 			case PROV_END: {
 				WasEndedBy we = (WasEndedBy) sb;
-				int i = originActivitiesId.indexOf(id(we.getActivity()));
-				int j = destinationActivitiesId.indexOf(id(we.getTrigger()));
+				int i = destinationActivitiesId.indexOf(id(we.getTrigger()));
+				int j = originActivitiesId.indexOf(id(we.getActivity()));
 				matrix.set(i, j, matrix.get(i, j) + 1);
 				break;
 			}

@@ -381,7 +381,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByAcAc.add(id(wi.getInformant()), id(wi.getInformed()));
 					}
 					this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
-					this.wasInformedBy.add(id(wi.getInformant()), id(wi.getInformed()));
+					this.wasInformedBy.add(id(wi.getInformed()),id(wi.getInformant()));
 				}
 				break;
 			}
