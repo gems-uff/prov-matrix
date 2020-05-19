@@ -5,7 +5,7 @@
 	<groupId>gems.ic.uff.br</groupId>
 	<artifactId>prov-matrix</artifactId>
 	<packaging>jar</packaging>
-	<version>1.4</version>
+	<version>1.5</version>
 	<name>prov-matrix</name>
 	<url>http://maven.apache.org</url>
 	<properties>
