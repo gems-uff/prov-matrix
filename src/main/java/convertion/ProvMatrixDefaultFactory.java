@@ -37,16 +37,20 @@ import org.openprovenance.prov.model.WasStartedBy;
 import model.ActivityActivity;
 import model.ActivityAgent;
 import model.ActivityEntity;
+import model.ActivityInstance;
 import model.AgentAgent;
+import model.AgentInstance;
 import model.EntityActivity;
 import model.EntityAgent;
 import model.EntityEntity;
+import model.EntityInstance;
 import model.ProvMatrix;
 import model.ProvRelation.Relation;
 
 public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 
 	private Document[] documents;
+	private ActivityInstance activityInstanceOf;
 	private ActivityActivity wasInformedBy;
 	private ActivityActivity wasStartedBy;
 	private ActivityActivity wasEndedBy;
@@ -65,6 +69,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	private EntityAgent wasAttributedTo;
 	private EntityAgent wasInfluencedByEAg;
 
+	private EntityInstance entityInstanceOf;
 	private EntityEntity wasDerivedFrom;
 	private EntityEntity specializationOf;
 	private EntityEntity alternateOf;
@@ -72,6 +77,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	private EntityEntity hadMember;
 	private EntityEntity wasInfluencedByEE;
 
+	private AgentInstance agentInstanceOf;
 	private AgentAgent actedOnBehalfOf;
 	private AgentAgent wasInfluencedByAgAg;
 
@@ -79,12 +85,18 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	private Set<String> entities;
 	private Set<String> activities;
 	private Map<String, String> labels;
+	private Map<String, String> entityTypes;
+	private Map<String, String> activityTypes;
+	private Map<String, String> agentTypes;
 
 	public ProvMatrixDefaultFactory() {
 		this.agents = new HashSet<>();
 		this.entities = new HashSet<>();
 		this.activities = new HashSet<>();
 		this.labels = new HashMap<String, String>();
+		this.entityTypes = new HashMap<String, String>();
+		this.activityTypes = new HashMap<String, String>();
+		this.agentTypes = new HashMap<String, String>();
 	}
 
 	public ProvMatrixDefaultFactory(String[] filePaths, String dir) {
@@ -132,6 +144,9 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 					if (et.getLabel() != null && !et.getLabel().isEmpty()) {
 						labels.put(id, et.getLabel().get(0).getValue());
 					}
+					if (et.getType() != null && !et.getType().isEmpty()) {
+						entityTypes.put(id, (String) et.getType().get(0).getValue());
+					}
 					entities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
 					Activity ac = (Activity) sb;
@@ -139,12 +154,18 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 					if (ac.getLabel() != null && !ac.getLabel().isEmpty()) {
 						labels.put(id, ac.getLabel().get(0).getValue());
 					}
+					if (ac.getType() != null && !ac.getType().isEmpty()) {
+						activityTypes.put(id, (String) ac.getType().get(0).getValue());
+					}
 					activities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
 					Agent ag = (Agent) sb;
 					String id = id(ag.getId());
 					if (ag.getLabel() != null && !ag.getLabel().isEmpty()) {
 						labels.put(id, ag.getLabel().get(0).getValue());
+					}
+					if (ag.getType() != null && !ag.getType().isEmpty()) {
+						agentTypes.put(id, (String) ag.getType().get(0).getValue());
 					}
 					agents.add(id(ag.getId()));
 				}
@@ -200,6 +221,9 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		matrices.add(this.wasInfluencedByEE);
 		matrices.add(this.actedOnBehalfOf);
 		matrices.add(this.wasInfluencedByAgAg);
+		matrices.add(this.entityInstanceOf);
+		matrices.add(this.activityInstanceOf);
+		matrices.add(this.agentInstanceOf);
 	}
 
 	private void setupStatements(List<String> agentsList, List<String> activitiesList, List<String> entitiesList) {
@@ -368,6 +392,34 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 				}
 			}
 		}
+		buildSubtypes();
+	}
+
+	private void buildSubtypes() {
+		if (agentTypes != null && !agentTypes.isEmpty()) {
+			this.agentInstanceOf = new AgentInstance(new ArrayList<String>(this.agents),
+					new HashSet<String>(agentTypes.values()));
+			Set<String> keys = agentTypes.keySet();
+			for (String key : keys) {
+				this.agentInstanceOf.add(key, agentTypes.get(key));
+			}
+		}
+		if (activityTypes != null && !activityTypes.isEmpty()) {
+			this.activityInstanceOf = new ActivityInstance(new ArrayList<String>(this.activities),
+					new HashSet<String>(activityTypes.values()));
+			Set<String> keys = activityTypes.keySet();
+			for (String key : keys) {
+				this.activityInstanceOf.add(key, activityTypes.get(key));
+			}
+		}
+		if (entityTypes != null && !entityTypes.isEmpty()) {
+			this.entityInstanceOf = new EntityInstance(new ArrayList<String>(this.entities),
+					new HashSet<String>(entityTypes.values()));
+			Set<String> keys = entityTypes.keySet();
+			for (String key : keys) {
+				this.entityInstanceOf.add(key, entityTypes.get(key));
+			}
+		}
 	}
 
 	private void processStatement(StatementOrBundle sb, boolean deriveInfluence) {
@@ -381,7 +433,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByAcAc.add(id(wi.getInformant()), id(wi.getInformed()));
 					}
 					this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
-					this.wasInformedBy.add(id(wi.getInformed()),id(wi.getInformant()));
+					this.wasInformedBy.add(id(wi.getInformed()), id(wi.getInformant()));
 				}
 				break;
 			}
@@ -795,6 +847,78 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 
 	public void setLabels(Map<String, String> labels) {
 		this.labels = labels;
+	}
+
+	public Map<String, String> getEntityTypes() {
+		return entityTypes;
+	}
+
+	public void setEntityTypes(Map<String, String> entityTypes) {
+		this.entityTypes = entityTypes;
+	}
+
+	public Map<String, String> getActivityTypes() {
+		return activityTypes;
+	}
+
+	public void setActivityTypes(Map<String, String> activityTypes) {
+		this.activityTypes = activityTypes;
+	}
+
+	public Map<String, String> getAgentTypes() {
+		return agentTypes;
+	}
+
+	public void setAgentTypes(Map<String, String> agentTypes) {
+		this.agentTypes = agentTypes;
+	}
+
+	public Set<String> getAgents() {
+		return agents;
+	}
+
+	public void setAgents(Set<String> agents) {
+		this.agents = agents;
+	}
+
+	public Set<String> getEntities() {
+		return entities;
+	}
+
+	public void setEntities(Set<String> entities) {
+		this.entities = entities;
+	}
+
+	public Set<String> getActivities() {
+		return activities;
+	}
+
+	public void setActivities(Set<String> activities) {
+		this.activities = activities;
+	}
+
+	public AgentInstance getAgentInstanceOf() {
+		return agentInstanceOf;
+	}
+
+	public void setAgentInstanceOf(AgentInstance agentInstanceOf) {
+		this.agentInstanceOf = agentInstanceOf;
+	}
+
+	public ActivityInstance getActivityInstanceOf() {
+		return activityInstanceOf;
+	}
+
+	public void setActivityInstanceOf(ActivityInstance activityInstanceOf) {
+		this.activityInstanceOf = activityInstanceOf;
+	}
+
+	public EntityInstance getEntityInstanceOf() {
+		return entityInstanceOf;
+	}
+
+	public void setEntityInstanceOf(EntityInstance entityInstanceOf) {
+		this.entityInstanceOf = entityInstanceOf;
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.Set;
 
 public class ProvType extends ProvConcept {
 
+	public static final String PROV_TYPE = "TYPE";
+	public static final String PROV_ABBREVIATE_TYPE = "T";
 	public static final String PROV_ENTITY = "ENTITY";
 	public static final String PROV_ABBREVIATE_ENTITY = "E";
 	public static final String PROV_AGENT = "AGENT";
