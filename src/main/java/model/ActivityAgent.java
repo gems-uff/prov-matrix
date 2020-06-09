@@ -205,7 +205,13 @@ public class ActivityAgent extends BasicProv implements ProvMatrix {
 			this.agentsId.add(dest);
 			j = this.agentsId.indexOf(dest);
 		}
-		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
+		if (i != -1 && j != -1) {
+			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		}
 	}
 
 	@Override

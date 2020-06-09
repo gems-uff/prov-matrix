@@ -71,7 +71,6 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 	}
 
 	public void add(List<String> activitiesList) {
-
 		if (activitiesList != null) {
 			for (String ac : activitiesList) {
 				if (!this.originActivitiesId.contains(ac)) {
@@ -229,20 +228,18 @@ public class ActivityActivity extends BasicProv implements ProvMatrix {
 		if (i == -1) {
 			this.originActivitiesId.add(src);
 			i = this.originActivitiesId.indexOf(src);
-			add(originActivitiesId);
 		}
 		if (j == -1) {
 			this.destinationActivitiesId.add(dest);
 			j = this.destinationActivitiesId.indexOf(dest);
-			add(destinationActivitiesId);
 		}
-		if (getRowDescriptors().size() != matrix.rows()) {
-			add(getRowDescriptors());
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
 		}
-		if (getColumnDescriptors().size() != matrix.columns()) {
-			add(getColumnDescriptors());
+		if (i != -1 && j != -1) {
+			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 		}
-		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}
 
 	@Override

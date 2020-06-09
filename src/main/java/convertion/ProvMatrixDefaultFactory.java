@@ -18,6 +18,7 @@ import org.openprovenance.prov.model.Document;
 import org.openprovenance.prov.model.Entity;
 import org.openprovenance.prov.model.HadMember;
 import org.openprovenance.prov.model.MentionOf;
+import org.openprovenance.prov.model.Other;
 import org.openprovenance.prov.model.QualifiedName;
 import org.openprovenance.prov.model.SpecializationOf;
 import org.openprovenance.prov.model.Statement;
@@ -84,6 +85,10 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	private Set<String> agents;
 	private Set<String> entities;
 	private Set<String> activities;
+	private List<String> agentsList;
+	private List<String> activitiesList;
+	private List<String> entitiesList;
+	private HashMap<String, String> cellParams;
 	private Map<String, String> labels;
 	private Map<String, String> entityTypes;
 	private Map<String, String> activityTypes;
@@ -94,6 +99,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		this.entities = new HashSet<>();
 		this.activities = new HashSet<>();
 		this.labels = new HashMap<String, String>();
+		this.cellParams = new HashMap<String, String>();
 		this.entityTypes = new HashMap<String, String>();
 		this.activityTypes = new HashMap<String, String>();
 		this.agentTypes = new HashMap<String, String>();
@@ -141,31 +147,64 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 				if (sb != null && sb.getKind() == Kind.PROV_ENTITY) {
 					Entity et = (Entity) sb;
 					String id = id(et.getId());
+
+					String extraParams = getStringParams(et);
 					if (et.getLabel() != null && !et.getLabel().isEmpty()) {
-						labels.put(id, et.getLabel().get(0).getValue());
+						labels.put(id, et.getLabel().get(0).getValue() + "," + extraParams);
+					} else {
+						if (extraParams.length() > 0) {
+							labels.put(id, "," + extraParams);
+						}
 					}
 					if (et.getType() != null && !et.getType().isEmpty()) {
-						entityTypes.put(id, (String) et.getType().get(0).getValue());
+						if (et.getType().get(0).getType() instanceof QualifiedName
+								&& !et.getType().get(0).getType().toString().contains("string")) {
+							entityTypes.put(id, id((QualifiedName) et.getType().get(0).getValue()));
+						} else {
+							entityTypes.put(id, (String) et.getType().get(0).getValue());
+						}
 					}
 					entities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
 					Activity ac = (Activity) sb;
 					String id = id(ac.getId());
+
+					String extraParams = getStringParams(ac);
 					if (ac.getLabel() != null && !ac.getLabel().isEmpty()) {
-						labels.put(id, ac.getLabel().get(0).getValue());
+						labels.put(id, ac.getLabel().get(0).getValue() + "," + extraParams);
+					} else {
+						if (extraParams.length() > 0) {
+							labels.put(id, "," + extraParams);
+						}
 					}
 					if (ac.getType() != null && !ac.getType().isEmpty()) {
-						activityTypes.put(id, (String) ac.getType().get(0).getValue());
+						if (ac.getType().get(0).getType() instanceof QualifiedName
+								&& !ac.getType().get(0).getType().toString().contains("string")) {
+							activityTypes.put(id, id((QualifiedName) ac.getType().get(0).getValue()));
+						} else {
+							activityTypes.put(id, (String) ac.getType().get(0).getValue());
+						}
 					}
 					activities.add(id);
 				} else if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
 					Agent ag = (Agent) sb;
 					String id = id(ag.getId());
+
+					String extraParams = getStringParams(ag);
 					if (ag.getLabel() != null && !ag.getLabel().isEmpty()) {
-						labels.put(id, ag.getLabel().get(0).getValue());
+						labels.put(id, ag.getLabel().get(0).getValue() + "," + extraParams);
+					} else {
+						if (extraParams.length() > 0) {
+							labels.put(id, "," + extraParams);
+						}
 					}
 					if (ag.getType() != null && !ag.getType().isEmpty()) {
-						agentTypes.put(id, (String) ag.getType().get(0).getValue());
+						if (ag.getType().get(0).getType() instanceof QualifiedName
+								&& !ag.getType().get(0).getType().toString().contains("string")) {
+							agentTypes.put(id, id((QualifiedName) ag.getType().get(0).getValue()));
+						} else {
+							agentTypes.put(id, (String) ag.getType().get(0).getValue());
+						}
 					}
 					agents.add(id(ag.getId()));
 				}
@@ -173,14 +212,46 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		}
 	}
 
+	private String getStringParams(StatementOrBundle sb) {
+		String others = "";
+		if (sb instanceof Statement) {
+			if (sb != null && sb.getKind() == Kind.PROV_ENTITY) {
+				Entity concept = (Entity) sb;
+				if (concept.getOther().size() > 0) {
+					List<Other> params = concept.getOther();
+					for (Other other : params) {
+						others += other.getElementName().getLocalPart() + " = \"" + other.getValue() + "\"; ";
+					}
+				}
+			} else if (sb != null && sb.getKind() == Kind.PROV_AGENT) {
+				Agent concept = (Agent) sb;
+				if (concept.getOther().size() > 0) {
+					List<Other> params = concept.getOther();
+					for (Other other : params) {
+						others += other.getElementName().getLocalPart() + " = \"" + other.getValue() + "\"; ";
+					}
+				}
+			} else if (sb != null && sb.getKind() == Kind.PROV_ACTIVITY) {
+				Activity concept = (Activity) sb;
+				if (concept.getOther().size() > 0) {
+					List<Other> params = concept.getOther();
+					for (Other other : params) {
+						others += other.getElementName().getLocalPart() + " = \"" + other.getValue() + "\"; ";
+					}
+				}
+			}
+		}
+		return others;
+	}
+
 	public List<ProvMatrix> buildMatrices(boolean deriveInfluence) {
 		List<ProvMatrix> matrices = new ArrayList<>();
 		for (int i = 0; i < documents.length; i++) {
 			List<StatementOrBundle> sbs;
 			buildTypeLists(i);
-			List<String> agentsList = new ArrayList<>(agents);
-			List<String> activitiesList = new ArrayList<>(activities);
-			List<String> entitiesList = new ArrayList<>(entities);
+			agentsList = new ArrayList<>(agents);
+			activitiesList = new ArrayList<>(activities);
+			entitiesList = new ArrayList<>(entities);
 			setupStatements(agentsList, activitiesList, entitiesList);
 			sbs = documents[i].getStatementOrBundle();
 			for (Iterator<StatementOrBundle> iterator = sbs.iterator(); iterator.hasNext();) {
@@ -231,14 +302,12 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasInformedBy = new ActivityActivity(activitiesList);
 			this.getWasInformedBy().setRelation(Relation.RELATION_COMMUNICATION);
 		} else {
-			this.getWasInformedBy().setRelation(Relation.RELATION_COMMUNICATION);
 			this.wasInformedBy.add(activitiesList);
 		}
 		if (this.wasStartedBy == null) {
 			this.wasStartedBy = new ActivityActivity(activitiesList);
 			this.wasStartedBy.setRelation(Relation.RELATION_START);
 		} else {
-			this.wasStartedBy.setRelation(Relation.RELATION_START);
 			this.wasStartedBy.add(activitiesList);
 		}
 		if (this.wasEndedBy == null) {
@@ -246,14 +315,12 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasEndedBy.setRelation(Relation.RELATION_END);
 		} else {
 			this.wasEndedBy.add(activitiesList);
-			this.wasEndedBy.setRelation(Relation.RELATION_END);
 		}
 		if (this.wasInfluencedByAcAc == null) {
 			this.wasInfluencedByAcAc = new ActivityActivity(activitiesList);
 			this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByAcAc.add(activitiesList);
-			this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
 		}
 
 		if (this.wasAssociatedWith == null) {
@@ -261,14 +328,12 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
 		} else {
 			this.wasAssociatedWith.add(activitiesList, agentsList);
-			this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
 		}
 		if (this.wasInfluencedByAcAg == null) {
 			this.wasInfluencedByAcAg = new ActivityAgent(activitiesList, agentsList);
 			this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByAcAg.add(activitiesList, agentsList);
-			this.wasInfluencedByAcAg.setRelation(Relation.RELATION_INFLUENCE);
 		}
 
 		if (this.used == null) {
@@ -276,7 +341,6 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.used.setRelation(Relation.RELATION_USAGE);
 		} else {
 			this.used.add(activitiesList, entitiesList);
-			this.used.setRelation(Relation.RELATION_USAGE);
 		}
 
 		if (this.wasInfluencedByAcE == null) {
@@ -284,7 +348,6 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByAcE.add(activitiesList, entitiesList);
-			this.wasInfluencedByAcE.setRelation(Relation.RELATION_INFLUENCE);
 		}
 
 		if (this.wasGeneratedBy == null) {
@@ -292,13 +355,11 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
 		} else {
 			this.wasGeneratedBy.add(entitiesList, activitiesList);
-			this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
 		}
 		if (this.wasInfluencedByEAc == null) {
 			this.wasInfluencedByEAc = new EntityActivity(entitiesList, activitiesList);
 			this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
-			this.wasInfluencedByEAc.setRelation(Relation.RELATION_INFLUENCE);
 			this.wasInfluencedByEAc.add(entitiesList, activitiesList);
 		}
 		if (this.wasInvalidatedBy == null) {
@@ -306,7 +367,6 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
 		} else {
 			this.wasInvalidatedBy.add(entitiesList, activitiesList);
-			this.wasInvalidatedBy.setRelation(Relation.RELATION_INVALIDATION);
 		}
 
 		if (this.wasAttributedTo == null) {
@@ -314,14 +374,12 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
 		} else {
 			this.wasAttributedTo.add(entitiesList, agentsList);
-			this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
 		}
 		if (this.wasInfluencedByEAg == null) {
 			this.wasInfluencedByEAg = new EntityAgent(entitiesList, agentsList);
 			this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByEAg.add(entitiesList, agentsList);
-			this.wasInfluencedByEAg.setRelation(Relation.RELATION_INFLUENCE);
 		}
 
 		if (this.wasDerivedFrom == null) {
@@ -329,36 +387,34 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
 		} else {
 			this.wasDerivedFrom.add(entitiesList);
-			this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
 		}
 		if (this.wasInfluencedByEE == null) {
 			this.wasInfluencedByEE = new EntityEntity(entitiesList);
 			this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByEE.add(entitiesList);
-			this.wasInfluencedByEE.setRelation(Relation.RELATION_INFLUENCE);
 		}
 		if (this.specializationOf == null) {
 			this.specializationOf = new EntityEntity(entitiesList);
 			this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
 		} else {
 			this.specializationOf.add(entitiesList);
-			this.specializationOf.setRelation(Relation.RELATION_SPECIALIZATION);
 		}
 		if (this.alternateOf == null) {
 			this.alternateOf = new EntityEntity(entitiesList);
 			this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
 		} else {
 			this.alternateOf.add(entitiesList);
-			this.alternateOf.setRelation(Relation.RELATION_ALTERNATE);
 		}
 		if (this.mentionOf == null) {
 			this.mentionOf = new EntityEntity(entitiesList);
+			this.mentionOf.setRelation(Relation.RELATION_MENTION);
 		} else {
 			this.mentionOf.add(entitiesList);
 		}
 		if (this.hadMember == null) {
 			this.hadMember = new EntityEntity(entitiesList);
+			this.hadMember.setRelation(Relation.RELATION_MEMBERSHIP);
 		} else {
 			this.hadMember.add(entitiesList);
 		}
@@ -368,14 +424,12 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
 		} else {
 			this.actedOnBehalfOf.add(agentsList);
-			this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
 		}
 		if (this.wasInfluencedByAgAg == null) {
 			this.wasInfluencedByAgAg = new AgentAgent(agentsList);
 			this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
 		} else {
 			this.wasInfluencedByAgAg.add(agentsList);
-			this.wasInfluencedByAgAg.setRelation(Relation.RELATION_INFLUENCE);
 		}
 	}
 
@@ -395,31 +449,80 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 		buildSubtypes();
 	}
 
-	private void buildSubtypes() {
+	public void buildAgentTypes() {
 		if (agentTypes != null && !agentTypes.isEmpty()) {
-			this.agentInstanceOf = new AgentInstance(new ArrayList<String>(this.agents),
-					new HashSet<String>(agentTypes.values()));
-			Set<String> keys = agentTypes.keySet();
-			for (String key : keys) {
-				this.agentInstanceOf.add(key, agentTypes.get(key));
+			this.agentInstanceOf = new AgentInstance(new ArrayList<String>(this.agents), new HashSet<String>());
+			for (String key : agents) {
+				String value = agentTypes.get(key);
+				if (value != null && value.contains("::") && !value.endsWith("::")) {
+					String[] values = value.split("::");
+					for (int i = 0; i < values.length; i++) {
+						if (!agentInstanceOf.getDestinationTypeAgentsId().contains(values[i])) {
+							agentInstanceOf.getDestinationTypeAgentsId().add(values[i]);
+						}
+						this.agentInstanceOf.add(key, values[i]);
+					}
+				} else {
+					if (!agentInstanceOf.getDestinationTypeAgentsId().contains(value)) {
+						agentInstanceOf.getDestinationTypeAgentsId().add(value);
+					}
+					this.agentInstanceOf.add(key, value);
+				}
 			}
 		}
+	}
+
+	public void buildActivityTypes() {
 		if (activityTypes != null && !activityTypes.isEmpty()) {
 			this.activityInstanceOf = new ActivityInstance(new ArrayList<String>(this.activities),
-					new HashSet<String>(activityTypes.values()));
-			Set<String> keys = activityTypes.keySet();
-			for (String key : keys) {
-				this.activityInstanceOf.add(key, activityTypes.get(key));
+					new HashSet<String>());
+			for (String key : activities) {
+				String value = activityTypes.get(key);
+				if (value != null && value.contains("::") && !value.endsWith("::")) {
+					String[] values = value.split("::");
+					for (int i = 0; i < values.length; i++) {
+						if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(values[i])) {
+							activityInstanceOf.getDestinationTypeActivitiesId().add(values[i]);
+						}
+						this.activityInstanceOf.add(key, values[i]);
+					}
+				} else {
+					if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(value)) {
+						activityInstanceOf.getDestinationTypeActivitiesId().add(value);
+					}
+					this.activityInstanceOf.add(key, value);
+				}
 			}
 		}
+	}
+
+	public void buildEntityTypes() {
 		if (entityTypes != null && !entityTypes.isEmpty()) {
-			this.entityInstanceOf = new EntityInstance(new ArrayList<String>(this.entities),
-					new HashSet<String>(entityTypes.values()));
-			Set<String> keys = entityTypes.keySet();
-			for (String key : keys) {
-				this.entityInstanceOf.add(key, entityTypes.get(key));
+			this.entityInstanceOf = new EntityInstance(new ArrayList<String>(this.entities), new HashSet<String>());
+			for (String key : entities) {
+				String value = entityTypes.get(key);
+				if (value != null && value.contains("::") && !value.endsWith("::")) {
+					String[] values = value.split("::");
+					for (int i = 0; i < values.length; i++) {
+						if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(values[i])) {
+							entityInstanceOf.getDestinationTypeEntitiesId().add(values[i]);
+						}
+						this.entityInstanceOf.add(key, values[i]);
+					}
+				} else {
+					if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(value)) {
+						entityInstanceOf.getDestinationTypeEntitiesId().add(value);
+					}
+					this.entityInstanceOf.add(key, value);
+				}
 			}
 		}
+	}
+
+	private void buildSubtypes() {
+		buildAgentTypes();
+		buildActivityTypes();
+		buildEntityTypes();
 	}
 
 	private void processStatement(StatementOrBundle sb, boolean deriveInfluence) {
@@ -430,10 +533,23 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 				if (wi.getInformant() != null && wi.getInformed() != null) {
 					if (deriveInfluence) {
 						this.wasInfluencedByAcAc.setRelation(Relation.RELATION_INFLUENCE);
-						this.wasInfluencedByAcAc.add(id(wi.getInformant()), id(wi.getInformed()));
+						this.wasInfluencedByAcAc.add(id(wi.getInformed()), id(wi.getInformant()));
 					}
 					this.wasInformedBy.setRelation(Relation.RELATION_COMMUNICATION);
-					this.wasInformedBy.add(id(wi.getInformed()), id(wi.getInformant()));
+					if (this.activities.contains(id(wi.getInformed()))
+							&& this.activities.contains(id(wi.getInformant()))) {
+						this.wasInformedBy.add(id(wi.getInformed()), id(wi.getInformant()));
+						String extraParams = "";
+						for (Other param : wi.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("WFB(" + activitiesList.indexOf(id(wi.getInformed())) + ","
+								+ activitiesList.indexOf(id(wi.getInformant())) + ")", extraParams);
+					} else {
+						System.out.println("Did not find act:" + wi.getInformed() + ", act: " + id(wi.getInformant()));
+						throw new RuntimeException(
+								"Did not find act:" + wi.getInformed() + ", act: " + id(wi.getInformant()));
+					}
 				}
 				break;
 			}
@@ -471,11 +587,17 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 					this.wasAssociatedWith.setRelation(Relation.RELATION_ASSOCIATION);
 					if (this.activities.contains(id(waw.getActivity())) && this.agents.contains(id(waw.getAgent()))) {
 						this.wasAssociatedWith.add(id(waw.getActivity()), id(waw.getAgent()));
+						String extraParams = "";
+						for (Other param : waw.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("WAW(" + activitiesList.indexOf(id(waw.getActivity())) + ","
+								+ agentsList.indexOf(id(waw.getAgent())) + ")", extraParams);
 					} else {
 						System.out
-								.println("Não encontrou act:" + id(waw.getActivity()) + ", ag: " + id(waw.getAgent()));
+								.println("Did not find act:" + id(waw.getActivity()) + ", agt: " + id(waw.getAgent()));
 						throw new RuntimeException(
-								"Não encontrou act:" + id(waw.getActivity()) + ", ag: " + id(waw.getAgent()));
+								"Did not find act:" + id(waw.getActivity()) + ", agt: " + id(waw.getAgent()));
 					}
 				}
 				break;
@@ -488,7 +610,20 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByEAg.add(id(wat.getEntity()), id(wat.getAgent()));
 					}
 					this.wasAttributedTo.setRelation(Relation.RELATION_ATTRIBUTION);
-					this.wasAttributedTo.add(id(wat.getEntity()), id(wat.getAgent()));
+					if (this.entities.contains(id(wat.getEntity())) && this.agents.contains(id(wat.getAgent()))) {
+						this.wasAttributedTo.add(id(wat.getEntity()), id(wat.getAgent()));
+						String extraParams = "";
+						for (Other param : wat.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("WAT(" + entitiesList.indexOf(id(wat.getEntity())) + ","
+								+ agentsList.indexOf(id(wat.getAgent())) + ")", extraParams);
+					} else {
+						System.out.println("Did not find ent:" + id(wat.getEntity()) + ", agt: " + id(wat.getAgent()));
+						throw new RuntimeException(
+								"Did not find ent:" + id(wat.getEntity()) + ", agt: " + id(wat.getAgent()));
+					}
+
 				}
 				break;
 			}
@@ -500,7 +635,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByAcE.add(id(usd.getActivity()), id(usd.getEntity()));
 					}
 					this.used.setRelation(Relation.RELATION_USAGE);
-					this.used.add(id(usd.getActivity()), id(usd.getEntity()));
+					if (this.activities.contains(id(usd.getActivity()))
+							&& this.entities.contains(id(usd.getEntity()))) {
+						this.used.add(id(usd.getActivity()), id(usd.getEntity()));
+						String extraParams = "";
+						for (Other param : usd.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("USD(" + activitiesList.indexOf(id(usd.getActivity())) + ","
+								+ entitiesList.indexOf(id(usd.getEntity())) + ")", extraParams);
+					} else {
+						System.out
+								.println("Did not find act:" + id(usd.getActivity()) + ", ent: " + id(usd.getEntity()));
+						throw new RuntimeException(
+								"Did not find act:" + id(usd.getActivity()) + ", ent: " + id(usd.getEntity()));
+					}
 				}
 				break;
 			}
@@ -524,7 +673,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByEAc.add(id(wgb.getEntity()), id(wgb.getActivity()));
 					}
 					this.wasGeneratedBy.setRelation(Relation.RELATION_GENERATION);
-					this.wasGeneratedBy.add(id(wgb.getEntity()), id(wgb.getActivity()));
+					if (this.entities.contains(id(wgb.getEntity()))
+							&& this.activities.contains(id(wgb.getActivity()))) {
+						this.wasGeneratedBy.add(id(wgb.getEntity()), id(wgb.getActivity()));
+						String extraParams = "";
+						for (Other param : wgb.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("WGB(" + entitiesList.indexOf(id(wgb.getEntity())) + ","
+								+ activitiesList.indexOf(id(wgb.getActivity())) + ")", extraParams);
+					} else {
+						System.out
+								.println("Did not find ent:" + id(wgb.getEntity()) + ", act: " + id(wgb.getActivity()));
+						throw new RuntimeException(
+								"Did not find ent:" + id(wgb.getEntity()) + ", act: " + id(wgb.getActivity()));
+					}
 				}
 				break;
 			}
@@ -537,6 +700,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 					}
 					this.wasDerivedFrom.setRelation(Relation.RELATION_DERIVATION);
 					this.wasDerivedFrom.add(id(wdf.getGeneratedEntity()), id(wdf.getUsedEntity()));
+					if (this.entities.contains(id(wdf.getGeneratedEntity()))
+							&& this.entities.contains(id(wdf.getUsedEntity()))) {
+						this.wasDerivedFrom.add(id(wdf.getGeneratedEntity()), id(wdf.getUsedEntity()));
+						String extraParams = "";
+						for (Other param : wdf.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("WDF(" + entitiesList.indexOf(id(wdf.getGeneratedEntity())) + ","
+								+ entitiesList.indexOf(id(wdf.getUsedEntity())) + ")", extraParams);
+					} else {
+						System.out.println("Did not find ent:" + id(wdf.getGeneratedEntity()) + ", ent: "
+								+ id(wdf.getUsedEntity()));
+						throw new RuntimeException("Did not find ent:" + id(wdf.getGeneratedEntity()) + ", ent: "
+								+ id(wdf.getUsedEntity()));
+					}
 				}
 				break;
 			}
@@ -597,7 +775,20 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						this.wasInfluencedByAgAg.add(id(aob.getDelegate()), id(aob.getResponsible()));
 					}
 					this.actedOnBehalfOf.setRelation(Relation.RELATION_DELEGATION);
-					this.actedOnBehalfOf.add(id(aob.getDelegate()), id(aob.getResponsible()));
+					if (this.agents.contains(id(aob.getDelegate())) && this.agents.contains(id(aob.getResponsible()))) {
+						this.actedOnBehalfOf.add(id(aob.getDelegate()), id(aob.getResponsible()));
+						String extraParams = "";
+						for (Other param : aob.getOther()) {
+							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
+						}
+						this.cellParams.put("AOB(" + agentsList.indexOf(id(aob.getDelegate())) + ","
+								+ agentsList.indexOf(id(aob.getResponsible())) + ")", extraParams);
+					} else {
+						System.out.println(
+								"Did not find agt:" + id(aob.getDelegate()) + ", agt: " + id(aob.getResponsible()));
+						throw new RuntimeException(
+								"Did not find agt:" + id(aob.getDelegate()) + ", agt: " + id(aob.getResponsible()));
+					}
 				}
 				break;
 			}
@@ -841,7 +1032,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 	}
 
 	@Override
-	public Map<String, String> getLabels() {
+	public Map<String, String> getDimensionLabels() {
 		return this.labels;
 	}
 
@@ -919,6 +1110,14 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 
 	public void setEntityInstanceOf(EntityInstance entityInstanceOf) {
 		this.entityInstanceOf = entityInstanceOf;
+	}
+
+	public HashMap<String, String> getCellParams() {
+		return cellParams;
+	}
+
+	public void setCellParams(HashMap<String, String> cellParams) {
+		this.cellParams = cellParams;
 	}
 
 }

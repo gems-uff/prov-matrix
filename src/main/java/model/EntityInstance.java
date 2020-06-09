@@ -32,8 +32,22 @@ public class EntityInstance extends BasicProv implements ProvMatrix {
 	public EntityInstance(List<String> entitiesList, Set<String> entityTypes) {
 		this();
 		this.originEntitiesId = entitiesList;
-		this.destinationTypeEntitiesId = new ArrayList<String>(entityTypes);
-		matrix = new CRSMatrix(entitiesList.size(), entityTypes.size());
+		this.destinationTypeEntitiesId = new ArrayList<String>();
+		for (String ett : entityTypes) {
+			if (ett.contains("::") && !ett.endsWith("::")) {
+				String[] etts = ett.split("::");
+				for (int i = 0; i < etts.length; i++) {
+					if (!destinationTypeEntitiesId.contains(etts[i])) {
+						destinationTypeEntitiesId.add(etts[i]);
+					}
+				}
+			} else {
+				if (!destinationTypeEntitiesId.contains(ett)) {
+					destinationTypeEntitiesId.add(ett);
+				}
+			}
+		}
+		matrix = new CRSMatrix(originEntitiesId.size(), destinationTypeEntitiesId.size());
 	}
 
 	public void add(String src, String dest) {
@@ -46,6 +60,10 @@ public class EntityInstance extends BasicProv implements ProvMatrix {
 		if (j == -1) {
 			this.destinationTypeEntitiesId.add(dest);
 			j = this.destinationTypeEntitiesId.indexOf(dest);
+		}
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}

@@ -58,6 +58,7 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 	private Set<String> entities;
 	private Set<String> activities;
 	private Map<String, String> labels;
+	private HashMap<String, String> cellParams;
 
 	public ProvMatrixExtendedFactory() {
 		this.agents = new HashSet<>();
@@ -645,12 +646,20 @@ public class ProvMatrixExtendedFactory implements ProvMatrixFactory {
 		this.wasInvalidatedBy = wasInvalidatedBy;
 	}
 
-	public Map<String, String> getLabels() {
+	public Map<String, String> getDimensionLabels() {
 		return labels;
 	}
 
 	public void setLabels(Map<String, String> labels) {
 		this.labels = labels;
+	}
+
+	public HashMap<String, String> getCellParams() {
+		return cellParams;
+	}
+
+	public void setCellParams(HashMap<String, String> cellParams) {
+		this.cellParams = cellParams;
 	}
 
 }

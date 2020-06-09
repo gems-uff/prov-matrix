@@ -1,5 +1,6 @@
 package convertion;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ public interface ProvMatrixFactory {
 	
 	public List<ProvMatrix> buildMatrices(boolean deriveInfluence);
 
-	public Map<String, String> getLabels();
+	public Map<String, String> getDimensionLabels();
+	public HashMap<String, String> getCellParams();
 
 }

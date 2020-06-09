@@ -222,6 +222,19 @@ public class EntityActivity extends BasicProv implements ProvMatrix {
 	public void add(String src, String dest) {
 		int i = this.entitiesId.indexOf(src);
 		int j = this.activitiesId.indexOf(dest);
+
+		if (i == -1) {
+			this.entitiesId.add(src);
+			i = this.entitiesId.indexOf(src);
+		}
+		if (j == -1) {
+			this.activitiesId.add(dest);
+			j = this.activitiesId.indexOf(dest);
+		}
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
 		if (i != -1 && j != -1) {
 			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 		}
@@ -231,7 +244,7 @@ public class EntityActivity extends BasicProv implements ProvMatrix {
 	public boolean isEmpty() {
 		return this.matrix.density() == 0.0;
 	}
-	
+
 	@Override
 	public String getIdentifier() {
 		return this.relation != null ? this.relation.getAbbreviate().replace(" ", "") : null;

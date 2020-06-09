@@ -211,14 +211,20 @@ public class EntityAgent extends BasicProv implements ProvMatrix {
 			this.agentsId.add(dest);
 			j = this.agentsId.indexOf(dest);
 		}
-		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
+		if (i != -1 && j != -1) {
+			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		}
 	}
 
 	@Override
 	public boolean isEmpty() {
 		return this.matrix.density() == 0.0;
 	}
-	
+
 	@Override
 	public String getIdentifier() {
 		return this.relation != null ? this.relation.getAbbreviate().replace(" ", "") : null;

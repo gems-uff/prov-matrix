@@ -261,6 +261,10 @@ public class EntityEntity extends BasicProv implements ProvMatrix {
 			this.destinationEntitiesId.add(dest);
 			j = this.destinationEntitiesId.indexOf(dest);
 		}
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}
 

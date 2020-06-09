@@ -30,11 +30,26 @@ public class ActivityInstance extends BasicProv implements ProvMatrix {
 	}
 
 	public ActivityInstance(List<String> activitiesList, Set<String> activityTypes) {
+		this();
 		this.originActivitiesId = activitiesList;
-		this.destinationTypeActivitiesId = new ArrayList<String>(activityTypes);
-		matrix = new CRSMatrix(activitiesList.size(), activityTypes.size());
+		this.destinationTypeActivitiesId = new ArrayList<String>();
+		for (String ett : activityTypes) {
+			if (ett.contains("::") && !ett.endsWith("::")) {
+				String[] etts = ett.split("::");
+				for (int i = 0; i < etts.length; i++) {
+					if (!destinationTypeActivitiesId.contains(etts[i])) {
+						destinationTypeActivitiesId.add(etts[i]);
+					}
+				}
+			} else {
+				if (!destinationTypeActivitiesId.contains(ett)) {
+					destinationTypeActivitiesId.add(ett);
+				}
+			}
+		}
+		matrix = new CRSMatrix(originActivitiesId.size(), destinationTypeActivitiesId.size());
 	}
-	
+
 	public void add(String src, String dest) {
 		int i = this.originActivitiesId.indexOf(src);
 		int j = this.destinationTypeActivitiesId.indexOf(dest);
@@ -46,7 +61,13 @@ public class ActivityInstance extends BasicProv implements ProvMatrix {
 			this.destinationTypeActivitiesId.add(dest);
 			j = this.destinationTypeActivitiesId.indexOf(dest);
 		}
-		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
+		if (i != -1 && j != -1) {
+			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		}
 	}
 
 	public CRSMatrix getMatrix() {

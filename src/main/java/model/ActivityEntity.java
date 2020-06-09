@@ -214,7 +214,13 @@ public class ActivityEntity extends BasicProv implements ProvMatrix {
 			this.entitiesId.add(dest);
 			j = this.entitiesId.indexOf(dest);
 		}
-		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
+		}
+		if (i != -1 && j != -1) {
+			this.matrix.set(i, j, this.matrix.get(i, j) + 1);
+		}
 	}
 
 	@Override

@@ -32,10 +32,24 @@ public class AgentInstance extends BasicProv implements ProvMatrix {
 	public AgentInstance(List<String> agentsList, Set<String> agentTypes) {
 		this();
 		this.originAgentsId = agentsList;
-		this.destinationTypeAgentsId = new ArrayList<String>(agentTypes);
-		matrix = new CRSMatrix(agentsList.size(), agentTypes.size());
+		this.destinationTypeAgentsId = new ArrayList<String>();
+		for (String agg : agentTypes) {
+			if (agg.contains("::") && !agg.endsWith("::")) {
+				String[] aggs = agg.split("::");
+				for (int i = 0; i < aggs.length; i++) {
+					if (!destinationTypeAgentsId.contains(aggs[i])) {
+						destinationTypeAgentsId.add(aggs[i]);
+					}
+				}
+			} else {
+				if (!destinationTypeAgentsId.contains(agg)) {
+					destinationTypeAgentsId.add(agg);
+				}
+			}
+		}
+		matrix = new CRSMatrix(originAgentsId.size(), destinationTypeAgentsId.size());
 	}
-	
+
 	public void add(String src, String dest) {
 		int i = this.originAgentsId.indexOf(src);
 		int j = this.destinationTypeAgentsId.indexOf(dest);
@@ -46,6 +60,10 @@ public class AgentInstance extends BasicProv implements ProvMatrix {
 		if (j == -1) {
 			this.destinationTypeAgentsId.add(dest);
 			j = this.destinationTypeAgentsId.indexOf(dest);
+		}
+		if (matrix.rows() != this.getRowDescriptors().size()
+				|| matrix.columns() != this.getColumnDescriptors().size()) {
+			matrix = super.growMatrix(matrix, this.getRowDescriptors().size(), this.getColumnDescriptors().size());
 		}
 		this.matrix.set(i, j, this.matrix.get(i, j) + 1);
 	}

@@ -4,7 +4,7 @@ import org.la4j.matrix.sparse.CRSMatrix;
 import org.openprovenance.prov.model.QualifiedName;
 
 public class BasicProv {
-
+	
 	public String id(QualifiedName qn) {
 		String id = "";
 		if (qn != null) {
