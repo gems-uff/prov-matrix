@@ -543,7 +543,7 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 						for (Other param : wi.getOther()) {
 							extraParams += param.getElementName().getLocalPart() + " = " + param.getValue() + ";";
 						}
-						this.cellParams.put("WFB(" + activitiesList.indexOf(id(wi.getInformed())) + ","
+						this.cellParams.put("WIB(" + activitiesList.indexOf(id(wi.getInformed())) + ","
 								+ activitiesList.indexOf(id(wi.getInformant())) + ")", extraParams);
 					} else {
 						System.out.println("Did not find act:" + wi.getInformed() + ", act: " + id(wi.getInformant()));

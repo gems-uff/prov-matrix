@@ -15,7 +15,7 @@ public interface ProvRelation {
 	public static final String PROV_END = "wasEndedBy";
 	public static final String PROV_ABBREVIATE_END = "E N D ";
 	public static final String PROV_COMMUNICATION = "wasInformedBy";
-	public static final String PROV_ABBREVIATE_COMMUNICATION = "W F B";
+	public static final String PROV_ABBREVIATE_COMMUNICATION = "W I B";
 	public static final String PROV_DERIVATION = "wasDerivedFrom";
 	public static final String PROV_ABBREVIATE_DERIVATION = "W D F";
 	public static final String PROV_ASSOCIATION = "wasAssociatedWith";
@@ -25,7 +25,7 @@ public interface ProvRelation {
 	public static final String PROV_DELEGATION = "actedOnBehalfOf";
 	public static final String PROV_ABBREVIATE_DELEGATION = "A OB";
 	public static final String PROV_INFLUENCE = "wasInfluencedBy";
-	public static final String PROV_ABBREVIATE_INFLUENCE = "W I B";
+	public static final String PROV_ABBREVIATE_INFLUENCE = "W F B";
 	public static final String PROV_ALTERNATE = "alternateOf";
 	public static final String PROV_ABBREVIATE_ALTERNATE = "A OF";
 	public static final String PROV_SPECIALIZATION = "specializationOf";
