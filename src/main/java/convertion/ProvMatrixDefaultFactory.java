@@ -454,19 +454,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.agentInstanceOf = new AgentInstance(new ArrayList<String>(this.agents), new HashSet<String>());
 			for (String key : agents) {
 				String value = agentTypes.get(key);
-				if (value != null && value.contains("::") && !value.endsWith("::")) {
-					String[] values = value.split("::");
-					for (int i = 0; i < values.length; i++) {
-						if (!agentInstanceOf.getDestinationTypeAgentsId().contains(values[i])) {
-							agentInstanceOf.getDestinationTypeAgentsId().add(values[i]);
+				if (value != null) {
+					if (value.contains("::") && !value.endsWith("::")) {
+						String[] values = value.split("::");
+						for (int i = 0; i < values.length; i++) {
+							if (!agentInstanceOf.getDestinationTypeAgentsId().contains(values[i])) {
+								agentInstanceOf.getDestinationTypeAgentsId().add(values[i]);
+							}
+							this.agentInstanceOf.add(key, values[i]);
 						}
-						this.agentInstanceOf.add(key, values[i]);
+					} else {
+						if (!agentInstanceOf.getDestinationTypeAgentsId().contains(value)) {
+							agentInstanceOf.getDestinationTypeAgentsId().add(value);
+						}
+						this.agentInstanceOf.add(key, value);
 					}
-				} else {
-					if (!agentInstanceOf.getDestinationTypeAgentsId().contains(value)) {
-						agentInstanceOf.getDestinationTypeAgentsId().add(value);
-					}
-					this.agentInstanceOf.add(key, value);
 				}
 			}
 		}
@@ -478,19 +480,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 					new HashSet<String>());
 			for (String key : activities) {
 				String value = activityTypes.get(key);
-				if (value != null && value.contains("::") && !value.endsWith("::")) {
-					String[] values = value.split("::");
-					for (int i = 0; i < values.length; i++) {
-						if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(values[i])) {
-							activityInstanceOf.getDestinationTypeActivitiesId().add(values[i]);
+				if (value != null) {
+					if (value.contains("::") && !value.endsWith("::")) {
+						String[] values = value.split("::");
+						for (int i = 0; i < values.length; i++) {
+							if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(values[i])) {
+								activityInstanceOf.getDestinationTypeActivitiesId().add(values[i]);
+							}
+							this.activityInstanceOf.add(key, values[i]);
 						}
-						this.activityInstanceOf.add(key, values[i]);
+					} else {
+						if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(value)) {
+							activityInstanceOf.getDestinationTypeActivitiesId().add(value);
+						}
+						this.activityInstanceOf.add(key, value);
 					}
-				} else {
-					if (!activityInstanceOf.getDestinationTypeActivitiesId().contains(value)) {
-						activityInstanceOf.getDestinationTypeActivitiesId().add(value);
-					}
-					this.activityInstanceOf.add(key, value);
 				}
 			}
 		}
@@ -501,19 +505,21 @@ public class ProvMatrixDefaultFactory implements ProvMatrixFactory {
 			this.entityInstanceOf = new EntityInstance(new ArrayList<String>(this.entities), new HashSet<String>());
 			for (String key : entities) {
 				String value = entityTypes.get(key);
-				if (value != null && value.contains("::") && !value.endsWith("::")) {
-					String[] values = value.split("::");
-					for (int i = 0; i < values.length; i++) {
-						if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(values[i])) {
-							entityInstanceOf.getDestinationTypeEntitiesId().add(values[i]);
+				if (value != null) {
+					if (value.contains("::") && !value.endsWith("::")) {
+						String[] values = value.split("::");
+						for (int i = 0; i < values.length; i++) {
+							if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(values[i])) {
+								entityInstanceOf.getDestinationTypeEntitiesId().add(values[i]);
+							}
+							this.entityInstanceOf.add(key, values[i]);
 						}
-						this.entityInstanceOf.add(key, values[i]);
+					} else {
+						if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(value)) {
+							entityInstanceOf.getDestinationTypeEntitiesId().add(value);
+						}
+						this.entityInstanceOf.add(key, value);
 					}
-				} else {
-					if (!entityInstanceOf.getDestinationTypeEntitiesId().contains(value)) {
-						entityInstanceOf.getDestinationTypeEntitiesId().add(value);
-					}
-					this.entityInstanceOf.add(key, value);
 				}
 			}
 		}
